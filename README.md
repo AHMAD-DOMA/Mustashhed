@@ -4,7 +4,7 @@ Welcome to "Mustashhed," our open-source project submitted as a contribution to 
 
 ## Idea of the Project
 
-Our project leverages a large corpus of text containing a substantial number of Arabic examples. We utilize [pySBD](https://github.com/nipunsadvilkar/pySBD) (Python Sentence Boundary Disambiguation) to split the text from the corpora into sentences, forming the examples.
+Our project leverages a set of large datasets of text containing a substantial number of Arabic texts. We utilize [pySBD](https://github.com/nipunsadvilkar/pySBD) (Python Sentence Boundary Disambiguation) to split the text from the corpora into sentences, forming the examples.
 
 Next, we employ the [aubmindlab/bert-base-arabertv02](https://huggingface.co/aubmindlab/bert-base-arabertv02) model to obtain embeddings for these examples. When a user enters a word along with its meaning and type, or uses the [Alriyadh dictionary](https://dictionary.ksaa.gov.sa/), we utilize [camel_tools](https://github.com/CAMeL-Lab/camel_tools) to retrieve all forms of the word based on its type (verb, noun, preposition).
 
