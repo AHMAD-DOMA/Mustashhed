@@ -7,7 +7,13 @@
     <link rel="stylesheet" id="main_stylesheet" href="static/styles/setup_2/main_style.css">
 
     <link rel="stylesheet" id="stylesheet" href="{% if mode == 'light' %}static/styles/setup_2/light_style.css{% else %}static/styles/setup_2/dark_style.css{% endif %}">
-
+    <style>
+        @font-face {
+            font-family: 'NotoKufiArabic-Regular';
+            src: url('static/styles/Noto_Kufi_Arabic/static/NotoKufiArabic-Regular.ttf') format('truetype');
+            /* You can also include other font formats for better compatibility */
+        }
+    </style>
 </head>
 <body>
 
@@ -49,15 +55,15 @@
                         width: 160px;
                         margin-bottom: 5px;
                         cursor: pointer;
-                        ">ادخل المعاني بنفسك</button>
+                        ">أدخل المعاني بنفسك</button>
 
     </form>
     <form id="examples_search_form" action="/get_examples_setup_2" method="POST">
         <label title="اكتب الكلمة مثل: 'يأكل'" for="word_input" class="word_label" >الكلمة:</label>
         <input placeholder="مثال: يأكل" title="اكتب الكلمة مثل: 'يأكل'" type="text" id="word_input" class="word_input" name="word" value="{{word}}" {% if list_of_meanings_dicts %}readonly{% endif %} style="{% if list_of_meanings_dicts %}color: gray;{% endif %}">
 
-        <img src="static/images/drop_down.png" style="width: 21px;position: absolute;margin: 22px  0 0 34px;">        <label title="اختر معنى الكلمة" for="type-select" class="meaning_label">المعنى:</label>
-        <select title="اختر معنى الكلمة" class="dropdown-select" name="meaning" id="type-select" {% if not list_of_meanings_dicts %}style="color: gray;"{% endif %} {% if not list_of_meanings_dicts %}disabled{% endif %}>
+        <img src="static/images/drop_down.png" style="width: 21px;position: absolute;margin: 22px  0 0 34px;">        <label title="اختر معنى الكلمة" for="word_input" class="meaning_label">المعنى:</label>
+        <select title="اختر معنى الكلمة" class="dropdown-select" name="meaning" id="type-select" {% if not list_of_meanings_dicts or list_of_meanings_dicts and word and examples %} style="color: gray;" readonly {% endif %}>
             {% if not list_of_meanings_dicts %}
             <option >لعرض المعاني: قم بكتابة الكلمة ثم اضغط على "البحث"</option>
             {% endif %}
@@ -82,25 +88,27 @@
             <input type="hidden" id="type_hiddenInput" name="resource_type" value="{{resource_type}}">
         </div>
 
-
-        <input type="submit" value="البحث" class="search-button">
+        <input title="اضغط لإدخال كلمة جديدة" value="بحث جديد" class="search-button" id="new_search_button" onclick="new_search()" style="color: gray;margin: -47px 240px 0 0;color: #e40000;background: gold">
+        <input type="submit" value="البحث" id="search_submit" class="search-button" {% if list_of_meanings_dicts and word and examples %} style="color: gray;" disabled {% endif %}>
         <div id="overlay">
             <div id="loader"></div>
             <span style="direction: rtl">جاري البحث...</span>
         </div>
     </form>
-    <ul>
-        {% for highlighted_word_with_examples in examples%}
-        <span class="examples_word">{{highlighted_word_with_examples[0]}}</span>
+    <ul id="examples_ul">
+        {% if examples %}
+            {% for highlighted_word_with_examples in examples%}
+            <span class="examples_word">{{highlighted_word_with_examples[0]}}</span>
 
-        {% for example in highlighted_word_with_examples[1] %}
-        <li>
-            {{example|safe}}
-        </li>
-        {% endfor %}
+            {% for example in highlighted_word_with_examples[1] %}
+            <li>
+                {{example|safe}}
+            </li>
+            {% endfor %}
 
 
-        {% endfor %}
+            {% endfor %}
+        {% endif %}
     </ul>
     <form id="set_mode_form" action="/set_mode" method="POST">
         <input type="hidden" id="mode_hiddenInput" name="mode" value="{{mode}}">
@@ -114,6 +122,57 @@
 
 
 <script>
+    // Get references to the button and your Flask variables
+    var button = document.getElementById('new_search_button');
+    var list_of_meanings_dicts = {{ list_of_meanings_dicts|default('undefined')|tojson|safe }};
+    var word = "{{ word }}";
+
+    // Check conditions and set the style accordingly
+    if (list_of_meanings_dicts !== 'undefined' && word) {
+        button.style.display = 'inline';
+    } else {
+        button.style.display = 'none';
+    }
+    function new_search(){
+        // Enable the button
+        var button = document.getElementById("search_submit");
+        button.disabled = false;
+        button.style.color = "#ffbd2c"
+
+        // Make the select element readonly and set its value to 'لعرض المعاني: قم بكتابة الكلمة ثم اضغط على "البحث"'
+        var selectElement = document.getElementById("type-select");
+        while (selectElement.firstChild) {
+            selectElement.removeChild(selectElement.firstChild);
+        }
+
+        var selectElement = document.getElementById("type-select");
+        var optionValue = 'لعرض المعاني: قم بكتابة الكلمة ثم اضغط على "البحث"';
+
+        // Create a new option element
+        var newOption = document.createElement("option");
+        newOption.value = optionValue;
+        newOption.text = optionValue;
+
+        // Add the new option to the select element
+        selectElement.add(newOption);
+
+        // Set the new option as the selected option
+        selectElement.value = optionValue;
+        selectElement.disabled = true;
+        selectElement.style.color = "gray";
+
+        // Enable the text input and set its value to empty
+        var textInput = document.getElementById("word_input");
+        textInput.readOnly = false;
+        textInput.value = "";
+        textInput.style.color = "#e41320";
+
+        var ulElement = document.getElementById("examples_ul");
+        while (ulElement.firstChild) {
+            ulElement.removeChild(ulElement.firstChild);
+        }
+        document.getElementById("new_search_button").style.display = "none";
+    }
     document.addEventListener("DOMContentLoaded", function () {
         // Get the value of the hidden input
         var hiddenInputValue = document.getElementById("type_hiddenInput").value;

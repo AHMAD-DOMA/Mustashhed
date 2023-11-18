@@ -1,3 +1,4 @@
+# Version 1.3
 import os
 from collections import defaultdict
 import re
@@ -21,6 +22,7 @@ from tqdm import tqdm
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(device)
 
+arabic_stop_words = ['اللاتي', 'كلا', 'ولكن', 'عسى', 'بهما', 'فيما', 'لكي', 'لدى', 'لستما', 'كلما', 'نحن', 'سوى', 'الذي', 'كيتما', 'هم', 'هؤلاء', 'وهو', 'بين', 'ليس', 'هيت', 'أنتن', 'اللواتي', 'أيك', 'إذ', 'غير', 'كل', 'هذي', 'أولئك', 'هيا', 'بماذا', 'أولالك', 'فإذا', 'إليكما', 'ذان', 'هذا', 'ذينك', 'حاشا', 'ثمة', 'متى', 'بلى', 'ولا', 'أينما', 'على', 'كي', 'ليسوا', 'ذلكن', 'وما', 'أما', 'هناك', 'كأي', 'لها', 'ألا', 'لكم', 'اللذين', 'أولائك', 'ليستا', 'لو', 'أولئكم', 'عليه', 'فمن', 'إذن', 'فيه', 'ذانك', 'أقل', 'لهن', 'لستن', 'بهن', 'لاسيما', 'هنا', 'وإذ', 'هذين', 'بمن', 'بعد', 'ذي', 'أنتم', 'أيكما', 'لي', 'حيث', 'نحو', 'أنت', 'ماذا', 'إذما', 'إنها', 'إنه', 'أيكم', 'تي', 'تلكما', 'إلا', 'بس', 'حين', 'عندما', 'عن', 'كليهما', 'يا', 'كيفما', 'أولاء', 'أيها', 'ذو', 'أيا', 'به', 'كما', 'لهم', 'عند', 'إلينا', 'لسنا', 'ذلكما', 'أيهما', 'اللائي', 'بخ', 'كيت', 'بكم', 'هاك', 'بعض', 'الذين', 'كم', 'هيهات', 'أيهم', 'هاهنا', 'ولو', 'أنى', 'لكما', 'لكنما', 'وإذا', 'بكما', 'هو', 'إنما', 'سوف', 'لولا', 'كلاهما', 'لنا', 'أ', 'ما', 'لا', 'هل', 'ليسا', 'ته', 'تلك', 'اللتيا', 'فيها', 'هلا', 'ذا', 'أوه', 'ذه', 'اللتان', 'أي', 'عدا', 'فيم', 'هكذا', 'فلا', 'ذين', 'ها', 'أيه', 'إذا', 'دون', 'إن', 'لم', 'حبذا', 'أكثر', 'إليكم', 'ذوا', 'أف', 'إلى', 'كذا', 'بل', 'إلا أن', 'في', 'كأين', 'ومن', 'ذواتا', 'بنا', 'أيهن', 'عل', 'كليكما', 'أو', 'اللتين', 'ذاك', 'إليك', 'نعم', 'هنالك', 'خلا', 'أولائكم', 'كأن', 'كلتا', 'ذلك', 'هاته', 'هن', 'مع', 'منذ', 'كذلك', 'بما', 'لسن', 'أم', 'تلكم', 'أيكن', 'قد', 'هما', 'لستم', 'منها', 'بها', 'ذلكم', 'أن', 'بكن', 'مهما', 'كأنما', 'بك', 'اللذان', 'لوما', 'كيف', 'حتى', 'أين', 'بهم', 'تينك', 'ثم', 'له', 'من', 'ليست', 'شتان', 'أنا', 'ذواتي', 'لك', 'أنتما', 'مذ', 'لكن', 'مما', 'ريث', 'وإن', 'هذان', 'مه', 'بيد', 'فإن', 'حيثما', 'إما', 'لهما', 'إليكن', 'تين', 'بي', 'لكيلا', 'لن', 'عليك', 'لئن', 'ليت', 'لست', 'لما', 'منه', 'هي', 'ممن', 'هذه', 'لعل']
 MAX_NUM_OF_EXAMPLES_PER_WORD = 20
 
 SUPPORTED_EXAMPLES_TYPES = ["news","quraan","poetry","hadith"]
@@ -63,8 +65,11 @@ class MustashhedApp:
 
 
     def change_the_setup(self):
-        self.setup = request.form.get('destination')
-        return render_template(f'setup_{self.setup}.html',examples=[], word="", meaning="", mode=self.mode, word_type="Noun", resource_type = self.resource_type)
+        try:
+            self.setup = request.form.get('destination')
+            return render_template(f'setup_{self.setup}.html',examples=[], word="", meaning="", mode=self.mode, word_type="Noun", resource_type = self.resource_type)
+        except:
+            return render_template(f'setup_1.html',examples=[], word="", meaning="", mode="light", word_type="Noun", resource_type = "all")
 
     def index(self):
         mode = request.form.get('mode')
@@ -74,63 +79,19 @@ class MustashhedApp:
                 mode = self.mode
             else:
                 mode = "light"
+        if not self.setup:
+            self.setup = 1
         return render_template(f'setup_{self.setup}.html',examples=[], word="", meaning="", mode=mode, word_type="Noun", resource_type = self.resource_type)
 
     def get_examples_setup_1(self):
-        self.word = request.form.get('word')
-        self.meaning = request.form.get('meaning')
-        self.resource_type = request.form.get('resource_type')
-        self.word_type = request.form['type-select']
-        examples_list = []
-
         try:
-            self.examples = self.get_examples_with_faiss(self.word, self.meaning, self.word_type, self.resource_type)
+            self.word = request.form.get('word')
+            self.meaning = request.form.get('meaning')
+            self.resource_type = request.form.get('resource_type')
+            self.word_type = request.form['type-select']
+            examples_list = []
 
-            # Sorting the examples based on the distance from the query (not by the type)
-            for word in self.examples.keys():
-                self.examples[word] = sorted(self.examples[word], key=lambda x: x['distance'], reverse=False)
-
-            for word in self.examples.keys():
-                examples = []
-                for dic in self.examples[word]:
-                    examples.append(dic['example'])
-                examples_list.append((word,examples))
-            self.examples = examples_list
-        except:
-            print("Exception in get_examples_setup_1()")
-            self.write_to_logs("Exception in get_examples_setup_1()")
-
-        return render_template(f'setup_{self.setup}.html', examples=self.examples, word=self.word,meaning=self.meaning, word_type= self.word_type,resource_type = self.resource_type , mode=self.mode)
-
-    def get_examples_setup_2(self):
-        self.word = request.form.get('word')
-        self.meaning = request.form.get('meaning')
-        self.resource_type = request.form.get('resource_type')
-
-        examples_list = []
-        self.examples= examples_list
-
-        if self.meaning == None:
-            self.list_of_meanings_dicts = self.get_list_of_meanings_dicts_for_word(self.word)
-            return render_template(f'setup_{self.setup}.html',list_of_meanings_dicts=self.list_of_meanings_dicts, examples=self.examples, word=self.word,meaning=self.meaning, word_type= self.word_type,resource_type = self.resource_type , mode=self.mode)
-
-        else:
             try:
-                self.meaning = request.form.get('meaning')
-                for item in self.list_of_meanings_dicts:
-                    if self.meaning == item['meaning']: # becuase the meaning in the UI is consists from word_with_diacr+ space+meaning
-                        type = item['pos']
-                        word_with_diacr = item['word_with_diacr']
-                        if type == "None" or "V" in type:
-                            self.word_type = "Verb"
-                        elif "N" in type:
-                            self.word_type = "Noun"
-                        elif "R" in type:
-                            self.word_type = "Preposition"
-                        else:
-                            self.word_type = "Verb"
-                        break
-                self.meaning = word_with_diacr +": "+ self.meaning
                 self.examples = self.get_examples_with_faiss(self.word, self.meaning, self.word_type, self.resource_type)
 
                 # Sorting the examples based on the distance from the query (not by the type)
@@ -144,30 +105,88 @@ class MustashhedApp:
                     examples_list.append((word,examples))
                 self.examples = examples_list
             except:
-                self.write_to_logs("Exception in get_examples_setup_2()")
+                print("Exception in get_examples_setup_1()")
+                self.write_to_logs("Exception in get_examples_setup_1()")
 
-        return render_template(f'setup_{self.setup}.html',list_of_meanings_dicts=[], examples=self.examples, word=self.word,meaning="",resource_type = self.resource_type , mode=self.mode)
+            return render_template(f'setup_{self.setup}.html', examples=self.examples, word=self.word,meaning=self.meaning, word_type= self.word_type,resource_type = self.resource_type , mode=self.mode)
+        except:
+            return render_template(f'setup_1.html',examples=[], word="", meaning="", mode="light", word_type="Noun", resource_type = "all")
+
+    def get_examples_setup_2(self):
+        try:
+            self.word = request.form.get('word')
+            self.meaning = request.form.get('meaning')
+            self.resource_type = request.form.get('resource_type')
+
+            examples_list = []
+            self.examples= examples_list
+
+            if self.meaning == 'لعرض المعاني: قم بكتابة الكلمة ثم اضغط على "البحث"' or self.meaning == None:
+                self.list_of_meanings_dicts = self.get_list_of_meanings_dicts_for_word(self.word)
+                return render_template(f'setup_{self.setup}.html',list_of_meanings_dicts=self.list_of_meanings_dicts, examples=None, word=self.word,meaning=self.meaning, word_type= self.word_type,resource_type = self.resource_type , mode=self.mode)
+
+            else:
+                try:
+                    self.meaning = request.form.get('meaning')
+                    for item in self.list_of_meanings_dicts:
+                        if self.meaning == item['meaning']: # becuase the meaning in the UI is consists from word_with_diacr+ space+meaning
+                            meaning_dict = item
+                            type = item['pos']
+                            word_with_diacr = item['word_with_diacr']
+                            if type == "None" or "V" in type:
+                                self.word_type = "Verb"
+                            elif "N" in type:
+                                self.word_type = "Noun"
+                            elif "R" in type:
+                                self.word_type = "Preposition"
+                            else:
+                                self.word_type = "Verb"
+                            break
+                    self.meaning = word_with_diacr +": "+ self.meaning
+                    self.examples = self.get_examples_with_faiss(self.word, self.meaning, self.word_type, self.resource_type)
+
+                    # Sorting the examples based on the distance from the query (not by the type)
+                    for word in self.examples.keys():
+                        self.examples[word] = sorted(self.examples[word], key=lambda x: x['distance'], reverse=False)
+
+                    for word in self.examples.keys():
+                        examples = []
+                        for dic in self.examples[word]:
+                            examples.append(dic['example'])
+                        examples_list.append((word,examples))
+                    self.examples = examples_list
+                except:
+                    self.write_to_logs("Exception in get_examples_setup_2()")
+
+            return render_template(f'setup_{self.setup}.html',list_of_meanings_dicts=[meaning_dict], examples=self.examples, word=self.word,meaning="",resource_type = self.resource_type , mode=self.mode)
+        except:
+            return render_template(f'setup_1.html',examples=[], word="", meaning="", mode="light", word_type="Noun", resource_type = "all")
 
     def contribute_in_alriyadh_dictionary_add(self):
-        word = request.form.get('word')
-        meaning = request.form.get('meaning')
-        resource_type = request.form.get('resource_type')
-        word_type = request.form['type-select']
-        example = request.form.get('example')
+        try:
+            word = request.form.get('word')
+            meaning = request.form.get('meaning')
+            resource_type = request.form.get('resource_type')
+            word_type = request.form['type-select']
+            example = request.form.get('example')
 
-        self.add_data_to_csv("static/users_contributions.csv", word, example, meaning, resource_type, word_type, report=False, add=True)
-        return render_template(f'setup_{self.setup}.html', word="",meaning="",resource_type = "",mode=self.mode)
+            self.add_data_to_csv("static/users_contributions.csv", word, example, meaning, resource_type, word_type, report=False, add=True)
+            return render_template(f'setup_{self.setup}.html', word="",meaning="",resource_type = "",mode=self.mode)
+        except:
+            return render_template(f'setup_1.html',examples=[], word="", meaning="", mode="light", word_type="Noun", resource_type = "all")
 
     def contribute_in_alriyadh_dictionary_report(self):
-        word = request.form.get('word')
-        meaning = request.form.get('meaning')
-        resource_type = request.form.get('resource_type')
-        word_type = request.form['type-select']
-        example = request.form.get('example')
+        try:
+            word = request.form.get('word')
+            meaning = request.form.get('meaning')
+            resource_type = request.form.get('resource_type')
+            word_type = request.form['type-select']
+            example = request.form.get('example')
 
-        self.add_data_to_csv("static/users_contributions.csv", word, example, meaning, resource_type, word_type, report=True, add=False)
-        return render_template(f'setup_{self.setup}.html', word="",meaning="",resource_type = "",mode=self.mode)
-
+            self.add_data_to_csv("static/users_contributions.csv", word, example, meaning, resource_type, word_type, report=True, add=False)
+            return render_template(f'setup_{self.setup}.html', word="",meaning="",resource_type = "",mode=self.mode)
+        except:
+            return render_template(f'setup_1.html',examples=[], word="", meaning="", mode="light", word_type="Noun", resource_type = "all")
 
 
     def add_data_to_csv(self,file_path, word, example, meaning,resource_type, word_type, report=False, add=False):
@@ -234,31 +253,29 @@ class MustashhedApp:
             # Parse and work with the response data (assuming it's in JSON format)
             data = response.json()
 
-            riyadh_dictionary = {}
-
+            list_of_meanings_dicts = []
+            id = 0
             for i in range(len(data)):
-                meanings = []
                 if len(data[i]['senses'])>0:
                     for dic in data[i]['senses']:
-                        meanings.append(str(dic['definition']['textRepresentations'][0]['form']))
-                riyadh_dictionary[str(data[i]['nonDiacriticsLemma'])] = {"word_with_diacr":str(data[i]['lemma']['formRepresentations'][0]['form']),
-                                                                         "pos" :str(data[i]['pos']),
-                                                                         "meanings":meanings}
-            list_of_meanings_dicts = []
-
-            id = 0
-            for word in riyadh_dictionary.keys():
-                for meaning in riyadh_dictionary[word]['meanings']:
-                    if meaning != "":
-                        list_of_meanings_dicts.append({"id":id, "meaning":meaning,"word":word,"word_with_diacr":riyadh_dictionary[word]["word_with_diacr"],"pos":riyadh_dictionary[word]["pos"]})
+                        meaning_dict = {}
+                        meaning_dict["id"] = id
+                        meaning_dict["meaning"] = str(dic['definition']['textRepresentations'][0]['form'])
+                        meaning_dict['nonDiacriticsLemma'] = str(data[i]['nonDiacriticsLemma'])
+                        meaning_dict["word_with_diacr"] = str(data[i]['nonDiacriticsLemma'])
+                        meaning_dict["pos"] = str(data[i]['pos'])
+                        list_of_meanings_dicts.append(meaning_dict)
                         id+=1
 
-            return list_of_meanings_dicts
+        return list_of_meanings_dicts
 
     def set_mode(self):
-        mode = request.form.get('mode')
-        self.mode = mode
-        return render_template(f'setup_{self.setup}.html', examples=self.examples, word=self.word,meaning=self.meaning, word_type= self.word_type, mode=self.mode,resource_type = self.resource_type)
+        try:
+            mode = request.form.get('mode')
+            self.mode = mode
+            return render_template(f'setup_{self.setup}.html', examples=[], word="",meaning="", word_type= "Noun", mode=self.mode,resource_type = "all")
+        except:
+            return render_template(f'setup_1.html',examples=[], word="", meaning="", mode="light", word_type="Noun", resource_type = "all")
 
     def move_tuple_to_beginning(self,lst, target_value):
         for i, item in enumerate(lst):
@@ -364,6 +381,11 @@ class MustashhedApp:
         return new_distances, new_indices
 
     def get_examples_with_faiss(self,word ,meaning, word_type, resource_type):
+
+        meaning_filtered_words = [word for word in meaning.split() if word not in arabic_stop_words]
+        # Join the filtered words back into a sentence
+        meaning = ' '.join(meaning_filtered_words)
+
         print(f"Query: word:{word} ,meaning:{meaning}, word_type:{word_type}, resource_type:{resource_type}")
         self.write_to_logs(f"Query: word:{word} ,meaning:{meaning}, word_type:{word_type}, resource_type:{resource_type}")
 

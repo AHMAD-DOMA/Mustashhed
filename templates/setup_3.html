@@ -15,6 +15,11 @@
 
     <a href="/"><img src="static/images/logo.png" alt="logo"></a>
     <style>
+        @font-face {
+            font-family: 'NotoKufiArabic-Regular';
+            src: url('static/styles/Noto_Kufi_Arabic/static/NotoKufiArabic-Regular.ttf') format('truetype');
+            /* You can also include other font formats for better compatibility */
+
         .search-button {
             padding: 4px;
             font-size: 21px;
@@ -72,8 +77,8 @@
                         ">ادخل المعاني بنفسك</button>
     </form>
 
-    <p style="direction: rtl;text-align: center;font-size: 25px;">شكرا جزيلا لرغبتك في المساهمة في تطوير معجم الرياض<br>
-        هنا يمكنك اضافة مثال جديد أو الإبلاغ عن مثال لا تراه مناسب<br>
+    <p style="direction: rtl;text-align: center;font-size: 22px;font-family: NotoKufiArabic-Regular;">شكرا جزيلا لرغبتك في المساهمة في تطوير معجم الرياض<br>
+        هنا يمكنك إضافة مثال جديد أو الإبلاغ عن مثال لا تراه مناسبا<br>
         مشاركتك سيتم مراجعتها وستساهم في تطوير معجم الرياض!</p>
     <form id="examples_search_form" action="/get_examples_setup_1" method="POST">
         <label title="اكتب الكلمة مثل: 'يأكل'" for="word_input" class="word_label">الكلمة:</label>
@@ -104,8 +109,7 @@
         <label  title="اكتب المثال" class="type_label" for="example">المثال:</label>
         <input title="اكتب المثال" type="text" id="example" class="meaning_input" name="example" value="" style="margin-bottom: 30px;margin-top: 15px;width: 87%;">
 
-        <input type="submit" title="اضافة مثال جديد"  onclick="submitForm('/contribute_in_alriyadh_dictionary_add',event)" value="اضافة" class="search-button">
-
+        <input type="submit" title="إضافة مثال جديد" onclick="submitForm('/contribute_in_alriyadh_dictionary_add',event)" value="إضافة" class="search-button" style="margin-bottom: 19px;">
         <input type="submit" title="الإبلاغ عن المثال"  onclick="submitForm('/contribute_in_alriyadh_dictionary_report',event)" value="الإبلاغ" class="search-button" style="color: red;">
     </form>
 

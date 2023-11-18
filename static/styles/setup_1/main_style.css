@@ -126,7 +126,9 @@ ul {
 li {
     padding: 10px;
     border-bottom: 2px solid #ffb000;
-    font-size: 25px;
+    font-size: 20px;
+    font-family: 'NotoKufiArabic-Regular';
+    font-weight: bolder;
 }
 .search-button {
     padding: 4px;
@@ -222,9 +224,9 @@ ul::-webkit-scrollbar-thumb {
 }
 .examples_word{
     color: red;
-    font-size: 50px;
+    font-size: 44px;
     margin-right: 1%;
-    font-family: system-ui;
+    font-family: NotoKufiArabic-Regular;
 }
 #mode-icon {
     user-select: none;
