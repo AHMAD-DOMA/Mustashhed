@@ -1,0 +1,47 @@
+body {
+    background-color: #000000;
+    color: #333;
+}
+
+.container {
+    background-color: #11102a;
+    color: #ffffff;
+}
+
+.word_input{
+    background: #dedede;
+}
+
+.meaning_input{
+    background: #dedede;
+}
+.type_label{
+    margin-right: 5px;
+}
+.lemma-custom-checkbox {
+    border: 2px solid #cfcfcf;
+}
+
+.lemma-custom-checkbox:checked {
+    background-color: #dedede;
+    border: 2px solid #cfcfcf;
+}
+
+.lemma-custom-checkbox:checked::before {
+    color: #e41320;
+}
+
+ul::-webkit-scrollbar-thumb {
+    background-color: #222140;   /* color of the scroll thumb */
+}
+
+#toggle-circle {
+    box-shadow: 0 0 10px #3498db;
+}
+
+.dropdown-select {
+    background-color: #dedede;
+}
+.type_button.active {
+    border:2px solid #e41320;
+}
