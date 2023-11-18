@@ -51,7 +51,7 @@ python main.py
 - **SANAD Dataset**: [SANAD Dataset](https://data.mendeley.com/datasets/57zpx667y9)
 
 ### Poetry
-- **Poetry Documents**: [Poetry Documents]([https://tanzil.net/docs/](https://drive.google.com/file/d/16jr56LBhKuZGYXZi_A39ab4GCGxZa-X_/view?usp=sharing))
+- **Poetry Documents**: [Poetry Documents](https://drive.google.com/file/d/16jr56LBhKuZGYXZi_A39ab4GCGxZa-X_/view?usp=sharing)
 - Data sources:
   - Shamela website: [Shamela.ws](https://shamela.ws/)
   - Adab website: [Adab.com](https://www.adab.com/)
