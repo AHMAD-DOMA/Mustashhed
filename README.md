@@ -28,7 +28,7 @@ pip install -r requirements.txt
 ```bash
 pip install faiss-cpu
 ```
-6. If you want to use 'Alriyadh dictionary' meanings you need to ask them to give you an API_KEY, then put your key in the API_KEY variable in main.py.
+6. If you want to use 'Alriyadh dictionary' meanings you need to ask them (dictionary@ksaa.gov.sa) to give you an API_KEY, then if they porvided you with the key, put your key in the API_KEY variable in main.py.
 7. Run the main application.
 
 ```bash
