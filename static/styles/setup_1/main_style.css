@@ -6,7 +6,6 @@ body {
 }
 
 header {
-    background-color: #123b48;
     text-align: center;
 }
 
@@ -15,7 +14,7 @@ header {
     height: 502px;
     margin: 14px auto 0 auto;
     padding: 20px;
-    border-radius: 8px;
+    border-radius: 17px;
 }
 
 
@@ -143,13 +142,6 @@ li {
     display: grid;
 }
 
-/* Change the button color on hover */
-.search-button:hover {
-    background-color: #ffb000;
-    color: #222140;
-    font-weight: bold;
-}
-
 header img {
     max-width: 70%;
     height: auto;
@@ -219,7 +211,6 @@ ul::-webkit-scrollbar-thumb {
     text-decoration: underline;
 }
 .examples_word{
-    color: #00cfff;
     font-size: 36px;
     margin-right: 1%;
     font-family: NotoKufiArabic-Regular;

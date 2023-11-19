@@ -1,10 +1,15 @@
 body {
-    color: #333; /* Set your default text color */
+    color: aliceblue;
+    background-color: #123b48
+}
+
+header{
+    background-color: #123b48
 }
 
 .container {
     background-color: #8c8c9940;
-    color: #ffffff;
+    color: white;
 }
 
 .word_input{
@@ -45,4 +50,14 @@ ul::-webkit-scrollbar-thumb {
 }
 .type_button.active {
     border:2px solid #e41320;
+}
+.examples_word{
+    color: #fc0232;
+    font-size: 36px;
+    margin-right: 1%;
+    font-family: NotoKufiArabic-Regular;
+    color: #fc0232;
+}
+.word_to_highlight{
+    color: #fc0232;
 }

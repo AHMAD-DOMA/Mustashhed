@@ -6,7 +6,6 @@ body {
 }
 
 header {
-    background-color: #123b48;
     text-align: center;
 }
 
@@ -15,7 +14,7 @@ header {
     height: 502px;
     margin: 14px auto 0 auto;
     padding: 20px;
-    border-radius: 8px;
+    border-radius: 17px;
 }
 
 
@@ -138,18 +137,11 @@ li {
     transition: background-color 0.3s;
     cursor: pointer;
     font-weight: bold;
-    width: 12%;
+    width: 16%;
     height: 4%;
-    margin: -47px 106px 0 0;
+    margin: -47px 92px 0 0;
     display: grid;
     float: right;
-}
-
-/* Change the button color on hover */
-.search-button:hover {
-    background-color: #ffb000;
-    color: #222140;
-    font-weight: bold;
 }
 
 header img {
@@ -218,11 +210,9 @@ ul::-webkit-scrollbar-thumb {
     border: 3px solid orange; /* creates padding around scroll thumb */
 }
 .word_to_highlight{
-    color: #00cfff;
     text-decoration: underline;
 }
 .examples_word{
-    color: #00cfff;
     font-size: 36px;
     margin-right: 1%;
     font-family: NotoKufiArabic-Regular;
@@ -258,7 +248,7 @@ ul::-webkit-scrollbar-thumb {
     margin-top: 10px;
     direction: rtl;
     color: #e41320;
-    font-size: 21px;
+    font-size: 18px;
     float: right;
     padding-left: 36px;
 }

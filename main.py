@@ -23,14 +23,14 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(device)
 
 arabic_stop_words = ['اللاتي', 'كلا', 'ولكن', 'عسى', 'بهما', 'فيما', 'لكي', 'لدى', 'لستما', 'كلما', 'نحن', 'سوى', 'الذي', 'كيتما', 'هم', 'هؤلاء', 'وهو', 'بين', 'ليس', 'هيت', 'أنتن', 'اللواتي', 'أيك', 'إذ', 'غير', 'كل', 'هذي', 'أولئك', 'هيا', 'بماذا', 'أولالك', 'فإذا', 'إليكما', 'ذان', 'هذا', 'ذينك', 'حاشا', 'ثمة', 'متى', 'بلى', 'ولا', 'أينما', 'على', 'كي', 'ليسوا', 'ذلكن', 'وما', 'أما', 'هناك', 'كأي', 'لها', 'ألا', 'لكم', 'اللذين', 'أولائك', 'ليستا', 'لو', 'أولئكم', 'عليه', 'فمن', 'إذن', 'فيه', 'ذانك', 'أقل', 'لهن', 'لستن', 'بهن', 'لاسيما', 'هنا', 'وإذ', 'هذين', 'بمن', 'بعد', 'ذي', 'أنتم', 'أيكما', 'لي', 'حيث', 'نحو', 'أنت', 'ماذا', 'إذما', 'إنها', 'إنه', 'أيكم', 'تي', 'تلكما', 'إلا', 'بس', 'حين', 'عندما', 'عن', 'كليهما', 'يا', 'كيفما', 'أولاء', 'أيها', 'ذو', 'أيا', 'به', 'كما', 'لهم', 'عند', 'إلينا', 'لسنا', 'ذلكما', 'أيهما', 'اللائي', 'بخ', 'كيت', 'بكم', 'هاك', 'بعض', 'الذين', 'كم', 'هيهات', 'أيهم', 'هاهنا', 'ولو', 'أنى', 'لكما', 'لكنما', 'وإذا', 'بكما', 'هو', 'إنما', 'سوف', 'لولا', 'كلاهما', 'لنا', 'أ', 'ما', 'لا', 'هل', 'ليسا', 'ته', 'تلك', 'اللتيا', 'فيها', 'هلا', 'ذا', 'أوه', 'ذه', 'اللتان', 'أي', 'عدا', 'فيم', 'هكذا', 'فلا', 'ذين', 'ها', 'أيه', 'إذا', 'دون', 'إن', 'لم', 'حبذا', 'أكثر', 'إليكم', 'ذوا', 'أف', 'إلى', 'كذا', 'بل', 'إلا أن', 'في', 'كأين', 'ومن', 'ذواتا', 'بنا', 'أيهن', 'عل', 'كليكما', 'أو', 'اللتين', 'ذاك', 'إليك', 'نعم', 'هنالك', 'خلا', 'أولائكم', 'كأن', 'كلتا', 'ذلك', 'هاته', 'هن', 'مع', 'منذ', 'كذلك', 'بما', 'لسن', 'أم', 'تلكم', 'أيكن', 'قد', 'هما', 'لستم', 'منها', 'بها', 'ذلكم', 'أن', 'بكن', 'مهما', 'كأنما', 'بك', 'اللذان', 'لوما', 'كيف', 'حتى', 'أين', 'بهم', 'تينك', 'ثم', 'له', 'من', 'ليست', 'شتان', 'أنا', 'ذواتي', 'لك', 'أنتما', 'مذ', 'لكن', 'مما', 'ريث', 'وإن', 'هذان', 'مه', 'بيد', 'فإن', 'حيثما', 'إما', 'لهما', 'إليكن', 'تين', 'بي', 'لكيلا', 'لن', 'عليك', 'لئن', 'ليت', 'لست', 'لما', 'منه', 'هي', 'ممن', 'هذه', 'لعل']
-MAX_NUM_OF_EXAMPLES_PER_WORD = 20
+MAX_NUM_OF_EXAMPLES_PER_WORD = 5
 
-# SUPPORTED_EXAMPLES_TYPES = ["news","quraan","poetry","hadith"]
-SUPPORTED_EXAMPLES_TYPES = ["poetry","hadith","quraan"]
+SUPPORTED_EXAMPLES_TYPES = ["news","quraan","poetry","hadith"]
+# SUPPORTED_EXAMPLES_TYPES = ["poetry","hadith","quraan"]
 
 EXAMPLES_TYPES_REQUIRE_METADATA = ["quraan","hadith"]
 
-API_KEY = "c1d09948-4148-4b78-9e88-3a52f60707f1"
+API_KEY = ""
 
 class MustashhedApp:
     def __init__(self, name):
@@ -121,7 +121,7 @@ class MustashhedApp:
             examples_list = []
             self.examples= examples_list
 
-            if self.meaning == 'لعرض المعاني: قم بكتابة الكلمة ثم اضغط على "البحث"' or self.meaning == None:
+            if self.meaning == 'لعرض المعاني: قم بكتابة الكلمة ثم اضغط على "استرجاع المعاني"' or self.meaning == None:
                 self.list_of_meanings_dicts = self.get_list_of_meanings_dicts_for_word(self.word)
                 return render_template(f'setup_{self.setup}.html',list_of_meanings_dicts=self.list_of_meanings_dicts, examples=None, word=self.word,meaning=self.meaning, word_type= self.word_type,resource_type = self.resource_type , mode=self.mode)
 
@@ -238,12 +238,9 @@ class MustashhedApp:
             "apikey": API_KEY
         }
 
-        # headers = {'Authorization': f'Basic {api_key}'}
-
         params = {
             "query": query_param,
         }
-
 
         # Make the GET request with certificate verification
         response = requests.get(url, headers=headers, params=params, verify=False)
@@ -264,8 +261,9 @@ class MustashhedApp:
                         meaning_dict['nonDiacriticsLemma'] = str(data[i]['nonDiacriticsLemma'])
                         meaning_dict["word_with_diacr"] = str(data[i]['nonDiacriticsLemma'])
                         meaning_dict["pos"] = str(data[i]['pos'])
-                        list_of_meanings_dicts.append(meaning_dict)
-                        id+=1
+                        if len(meaning_dict["meaning"]) > 0:
+                            list_of_meanings_dicts.append(meaning_dict)
+                            id+=1
 
         return list_of_meanings_dicts
 
@@ -549,7 +547,7 @@ class MustashhedApp:
         html_output += sentence[current_pos:]  # Append the remaining non-red part
 
         if example_type == "quraan":
-            html_output += '<span title="موقع تنزيل" style="font-size: 14px;margin-right: 6px;">مصدر النص القرآني : <a href="https://tanzil.net/" style="color: firebrick;">موقع تنزيل</a></span>'
+            html_output += '<span title="موقع تنزيل" style="font-size: 14px;margin-right: 6px;">مصدر النص القرآني : <a href="https://tanzil.net/" style="color: Black;">موقع تنزيل</a></span>'
 
         html_output += '</span>'
         return html_output

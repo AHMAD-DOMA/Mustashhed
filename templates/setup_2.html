@@ -68,17 +68,18 @@
     </form>
     <form id="examples_search_form" action="/get_examples_setup_2" method="POST">
         <label title="اكتب الكلمة مثل: 'يأكل'" for="word_input" class="word_label" >الكلمة:</label>
-        <input placeholder="مثال: يأكل" title="اكتب الكلمة مثل: 'يأكل'" type="text" id="word_input" class="word_input" name="word" value="{{word}}" {% if list_of_meanings_dicts %}readonly{% endif %} style="{% if list_of_meanings_dicts %}color: gray;{% endif %}">
+        <input placeholder="مثال: يأكل"  type="text" id="word_input" class="word_input" name="word" value="{{word}}" {% if list_of_meanings_dicts %} readonly style="color: gray; cursor: not-allowed" title="اضغط على إفراغ لإدخال كلمة جديدة" {% else %} title="اكتب الكلمة مثل: 'يأكل'" {% endif %}>
 
-        <img src="static/images/drop_down.png" style="width: 21px;position: absolute;margin: 22px  0 0 34px;">        <label title="اختر معنى الكلمة" for="word_input" class="meaning_label">المعنى:</label>
-        <select title="اختر معنى الكلمة" class="dropdown-select" name="meaning" id="type-select" {% if not list_of_meanings_dicts or list_of_meanings_dicts and word and examples %} style="color: gray;" readonly {% endif %}>
+        <img src="static/images/drop_down.png" style="width: 21px;position: absolute;margin: 22px  0 0 34px;">
+        <label title="اختر معنى الكلمة" for="type-select" class="meaning_label">المعنى:</label>
+        <select title="اختر معنى الكلمة" class="dropdown-select" name="meaning" id="type-select" {% if not list_of_meanings_dicts or list_of_meanings_dicts and word and examples %} style="color: gray; cursor: not-allowed" readonly {% endif %}>
             {% if not list_of_meanings_dicts %}
-            <option >لعرض المعاني: قم بكتابة الكلمة ثم اضغط على "البحث"</option>
+            <option>لعرض المعاني: قم بكتابة الكلمة ثم اضغط على "استرجاع المعاني"</option>
             {% endif %}
             {% if list_of_meanings_dicts %}
             {% for item in list_of_meanings_dicts %}
             <option value="{{ item['meaning'] }}" title="{{ item['word_with_diacr'] + ': ' + item['meaning'] }}">
-                {{ item['word_with_diacr'] + ": " + ' '.join(item['meaning'].split()[:5]) + ('...' if item['meaning'].split()|length > 5 else '') }}
+                {{ item['word_with_diacr'] + ": " + ' '.join(item['meaning'].split()[:7]) + ('...' if item['meaning'].split()|length > 7 else '') }}
             </option>
             {% endfor %}
             {% endif %}
@@ -96,11 +97,11 @@
             <input type="hidden" id="type_hiddenInput" name="resource_type" value="{{resource_type}}">
         </div>
 
-        <input title="اضغط لإدخال كلمة جديدة" value="بحث جديد" class="search-button" id="new_search_button" onclick="new_search()" style="color: gray;margin: -47px 240px 0 0;color: #e40000;background: gold">
-        <input type="submit" value="البحث" id="search_submit" class="search-button" {% if list_of_meanings_dicts and word and examples %} style="color: gray;" disabled {% endif %}>
+        <input title="اضغط لإدخال كلمة جديدة" value="إفراغ" class="search-button" id="new_search_button" onclick="new_search()" style="margin: -47px 273px 0px 0px;color: rgb(228, 0, 0);background: gold;display: none;width: 43px;">
+        <input type="submit" id="search_submit" class="search-button" {% if list_of_meanings_dicts and word and examples %} style="cursor: not-allowed" disabled {% endif %}   {% if not word and not list_of_meanings_dicts %} value="استرجاع المعاني" title="استرجاع المعاني" {% else %} value="البحث عن الأمثلة" {% if list_of_meanings_dicts and word and examples %} title="اضغط على إفراغ لإدخال كلمة جديدة" {% else %} title="البحث عن الأمثلة" {% endif %} {% endif %}>
         <div id="overlay">
             <div id="loader"></div>
-            <span style="direction: rtl">جاري البحث...</span>
+            <span style="direction: rtl">جارٍ البحث...</span>
         </div>
     </form>
     <ul id="examples_ul">
@@ -146,15 +147,20 @@
         var button = document.getElementById("search_submit");
         button.disabled = false;
         button.style.color = "#ffbd2c"
+        // Change the value attribute
+        button.value = "استرجاع المعاني";
+        // Change the title attribute
+        button.title = "استرجاع المعاني";
+        button.style.cursor = "pointer";
 
-        // Make the select element readonly and set its value to 'لعرض المعاني: قم بكتابة الكلمة ثم اضغط على "البحث"'
+        // Make the select element readonly and set its value to 'لعرض المعاني: قم بكتابة الكلمة ثم اضغط على "استرجاع المعاني"'
         var selectElement = document.getElementById("type-select");
         while (selectElement.firstChild) {
             selectElement.removeChild(selectElement.firstChild);
         }
 
         var selectElement = document.getElementById("type-select");
-        var optionValue = 'لعرض المعاني: قم بكتابة الكلمة ثم اضغط على "البحث"';
+        var optionValue = 'لعرض المعاني: قم بكتابة الكلمة ثم اضغط على "استرجاع المعاني"';
 
         // Create a new option element
         var newOption = document.createElement("option");
@@ -174,6 +180,9 @@
         textInput.readOnly = false;
         textInput.value = "";
         textInput.style.color = "#e41320";
+        textInput.title = "البحث عن الأمثلة";
+        // Make the cursor style normal
+        textInput.style.cursor = "text";
 
         var ulElement = document.getElementById("examples_ul");
         while (ulElement.firstChild) {

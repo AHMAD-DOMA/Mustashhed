@@ -1,28 +1,40 @@
 body {
-    color: #333;
+    background-color: #a9cae9
 }
 
 .container {
-    background-color: #8c8c9940;
-    color: #ffffff;
+    background-color: #496b8a17;
 }
-
+header{
+    background-color: #a9cae9
+}
 .word_input{
-    background: #dedede;
-}
 
+}
+.word_to_highlight{
+    color: #fc0232;
+}
 .meaning_input{
-    background: #dedede;
 }
 .type_label{
     margin-right: 5px;
+    color: black;
+}
+.meaning_label{
+    color: black;
+}
+.word_label{
+    color: black;
+}
+.resource_type_lable{
+    color: black;
 }
 .lemma-custom-checkbox {
     border: 2px solid #cfcfcf;
 }
 
 .lemma-custom-checkbox:checked {
-    background-color: #dedede;
+
     border: 2px solid #cfcfcf;
 }
 
@@ -39,8 +51,11 @@ ul::-webkit-scrollbar-thumb {
 }
 
 .dropdown-select {
-    background-color: #dedede;
+
 }
 .type_button.active {
     border:2px solid #e41320;
+}
+.examples_word{
+    color: #fc0232
 }

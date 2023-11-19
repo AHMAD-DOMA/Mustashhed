@@ -1,10 +1,13 @@
 body {
     color: #333; /* Set your default text color */
+    background-color: #a9cae9
 }
-
+header{
+    background-color: #a9cae9
+}
 .container {
-    background-color: #8c8c9940;
-    color: #ffffff;
+    background-color: #496b8a17;
+    color: black;
 }
 
 .word_input{
@@ -17,6 +20,16 @@ body {
 
 .type_label{
     margin-right: 5px;
+    color: black;
+}
+.meaning_label{
+    color: black;
+}
+.word_label{
+    color: black;
+}
+.resource_type_lable{
+    color: black;
 }
 
 .lemma-custom-checkbox {
@@ -45,4 +58,14 @@ ul::-webkit-scrollbar-thumb {
 }
 .type_button.active {
     border:2px solid #e41320;
+}
+.examples_word{
+    color: #fc0232;
+    font-size: 36px;
+    margin-right: 1%;
+    font-family: NotoKufiArabic-Regular;
+    color: #fc0232;
+}
+.word_to_highlight{
+    color: #fc0232;
 }
