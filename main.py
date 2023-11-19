@@ -140,7 +140,7 @@ class MustashhedApp:
                             elif "R" in type:
                                 self.word_type = "Preposition"
                             else:
-                                self.word_type = "Verb"
+                                self.word_type = "Noun"
                             break
                     self.meaning = word_with_diacr +": "+ self.meaning
                     self.examples = self.get_examples_with_faiss(self.word, self.meaning, self.word_type, self.resource_type)
