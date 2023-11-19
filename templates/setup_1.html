@@ -13,13 +13,21 @@
             src: url('static/styles/Noto_Kufi_Arabic/static/NotoKufiArabic-Regular.ttf') format('truetype');
             /* You can also include other font formats for better compatibility */
         }
+        body {
+            margin: 0;
+            padding: 0;
+            background-image: url({% if mode=="dark" %} "static/images/dark/background.png" {% else %} "static/images/light/background.png" {% endif %});
+            background-size: cover; /* This property ensures that the background image covers the entire body */
+            background-position: center; /* Centers the background image */
+            background-repeat: repeat;
+        }
     </style>
 </head>
 <body>
 
 <header>
 
-    <a href="/"><img src="static/images/logo.png" alt="logo"></a>
+    <a href="/"><img {% if mode=="dark" %} src="static/images/dark/logo.png" {% else %} src="static/images/light/logo.png" {% endif %} alt="logo"></a>
 
 </header>
 

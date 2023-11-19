@@ -1,48 +1,45 @@
 body {
-    background-color: #ececec; /* Set your default background color */
-    color: #333; /* Set your default text color */
+    color: #333;
 }
 
 .container {
-    background-color: #f4f5f7;
-    color: #222140;
+    background-color: #8c8c9940;
+    color: #ffffff;
 }
 
 .word_input{
-    background: #ffffff;
+    background: #dedede;
 }
 
 .meaning_input{
-    background: #ffffff;
+    background: #dedede;
 }
-
 .type_label{
     margin-right: 5px;
 }
-
 .lemma-custom-checkbox {
-    border: 2px solid #20272CFF;
+    border: 2px solid #cfcfcf;
 }
 
 .lemma-custom-checkbox:checked {
-    background-color: #222140;
-    border: 2px solid #20272CFF;
+    background-color: #dedede;
+    border: 2px solid #cfcfcf;
 }
 
 .lemma-custom-checkbox:checked::before {
-    color: #ffcd5f;
+    color: #e41320;
 }
 
 ul::-webkit-scrollbar-thumb {
-    background-color: #f4f5f7;   /* color of the scroll thumb */
+    background-color: #222140;   /* color of the scroll thumb */
 }
 
 #toggle-circle {
-    box-shadow: 0 0 10px #323232;
+    box-shadow: 0 0 10px #3498db;
 }
 
 .dropdown-select {
-    background-color: #fff;
+    background-color: #dedede;
 }
 .type_button.active {
     border:2px solid #e41320;

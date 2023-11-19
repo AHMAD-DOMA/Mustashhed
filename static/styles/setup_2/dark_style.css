@@ -1,38 +1,39 @@
 body {
-    background-color: #000000;
-    color: #333;
+    color: #333; /* Set your default text color */
 }
 
 .container {
-    background-color: #11102a;
+    background-color: #8c8c9940;
     color: #ffffff;
 }
 
 .word_input{
-    background: #dedede;
+    background: #ffffff;
 }
 
 .meaning_input{
-    background: #dedede;
+    background: #ffffff;
 }
+
 .type_label{
     margin-right: 5px;
 }
+
 .lemma-custom-checkbox {
-    border: 2px solid #cfcfcf;
+    border: 2px solid #20272CFF;
 }
 
 .lemma-custom-checkbox:checked {
-    background-color: #dedede;
-    border: 2px solid #cfcfcf;
+    background-color: #222140;
+    border: 2px solid #20272CFF;
 }
 
 .lemma-custom-checkbox:checked::before {
-    color: #e41320;
+    color: #ffcd5f;
 }
 
 ul::-webkit-scrollbar-thumb {
-    background-color: #222140;   /* color of the scroll thumb */
+    background-color: #f4f5f7;   /* color of the scroll thumb */
 }
 
 #toggle-circle {
@@ -40,7 +41,7 @@ ul::-webkit-scrollbar-thumb {
 }
 
 .dropdown-select {
-    background-color: #dedede;
+    background-color: #fff;
 }
 .type_button.active {
     border:2px solid #e41320;

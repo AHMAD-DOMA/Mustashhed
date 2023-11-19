@@ -1,11 +1,10 @@
 body {
-    background-color: #ececec; /* Set your default background color */
     color: #333; /* Set your default text color */
 }
 
 .container {
-    background-color: #f4f5f7;
-    color: #222140;
+    background-color: #8c8c9940;
+    color: #ffffff;
 }
 
 .word_input{
@@ -38,7 +37,7 @@ ul::-webkit-scrollbar-thumb {
 }
 
 #toggle-circle {
-    box-shadow: 0 0 10px #323232;
+    box-shadow: 0 0 10px #3498db;
 }
 
 .dropdown-select {
