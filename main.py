@@ -100,7 +100,7 @@ class MustashhedApp:
 
                 for word in self.examples.keys():
                     examples = []
-                    for dic in self.examples[word]:
+                    for dic in self.examples[word][:MAX_NUM_OF_EXAMPLES_PER_WORD]:
                         examples.append(dic['example'])
                     examples_list.append((word,examples))
                 self.examples = examples_list
@@ -151,7 +151,7 @@ class MustashhedApp:
 
                     for word in self.examples.keys():
                         examples = []
-                        for dic in self.examples[word]:
+                        for dic in self.examples[word][:MAX_NUM_OF_EXAMPLES_PER_WORD]:
                             examples.append(dic['example'])
                         examples_list.append((word,examples))
                     self.examples = examples_list
@@ -444,8 +444,6 @@ class MustashhedApp:
                     words_form_examples.append(self.generate_html_sentence(sentence=self.sentences[_type][sentence_index], word_to_highlight=word_form,example_type=_type,sentence_index=sentence_index))
                     self.write_to_logs(f"word:{word_form}, example:{self.sentences[_type][sentence_index]}")
                     distances.append(distance)
-                    if len(words_form_examples) == MAX_NUM_OF_EXAMPLES_PER_WORD:
-                        break
                 current_resource_type_all_words_forms_examples.append((word_form, words_form_examples, distances))
 
             examples_dict[_type] = current_resource_type_all_words_forms_examples
