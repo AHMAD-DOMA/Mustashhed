@@ -49,67 +49,64 @@
 
 <div class="container">
     <form action="/change_the_setup" method="post">
-        <button type="submit" name="destination" value="3" style="
-                        background: #222140;
-                        color: #02fd00;
-                        padding: 4px;
-                        font-size: 16px;
+        <button class="destination active_destination" type="submit" name="destination" value="3" style="
+                        padding: 0px;
+                        font-size: 14px;
                         display: inline-block;
-                        width: 180px;
+                        width: 203px;
                         margin-bottom: 5px;
                         cursor: pointer;
                         direction: rtl;
                         margin-left: 24px;
+                        font-family: 'NotoKufiArabic-Regular';
+                        border-radius: 8px;
                         ">شارك في تطوير معجم الرياض!</button>
-        <button type="submit" name="destination" value="2" style="
-                        background: #222140;
-                        color: #ffffff;
-                        padding: 4px;
-                        font-size: 16px;
+        <button class="destination" type="submit" name="destination" value="2" style="
+                        padding: 0px;
+                        font-size: 14px;
                         display: inline-block;
-                        margin-left: 266px;
-                        width: 160px;
+                        margin-left: 235px;
+                        width: 188px;
                         margin-bottom: 5px;
                         cursor: pointer;
+                        font-family: 'NotoKufiArabic-Regular';
+                        border-radius: 8px;
                         ">استخدم معاني معجم الرياض</button>
-        <button type="submit" name="destination" value="1" style="
-                        background: #222140;
-                        color: #ffffff;
-                        padding: 4px;
-                        font-size: 16px;
+        <button class="destination" type="submit" name="destination" value="1" style="
+                        padding: 0px;
+                        font-size: 14px;
                         display: inline-block;
-                        width: 160px;
+                        width: 140px;
                         margin-bottom: 5px;
                         cursor: pointer;
-                        ">ادخل المعاني بنفسك</button>
+                        font-family: 'NotoKufiArabic-Regular';
+                        border-radius: 8px;
+                        ">أدخل المعاني بنفسك</button>
+
     </form>
 
-    <p style="direction: rtl;text-align: center;font-size: 22px;font-family: NotoKufiArabic-Regular;.type_label{margin-right: 5px;color: black;
-}
-.meaning_label{color: black;
-}
-.word_label{color: black;
-}
-.resource_type_lable{color: black;
-};color: black;">شكرا جزيلا لرغبتك في المساهمة في تطوير معجم الرياض<br>
-        هنا يمكنك إضافة مثال جديد أو الإبلاغ عن مثال لا تراه مناسبا<br>
-        مشاركتك سيتم مراجعتها وستساهم في تطوير معجم الرياض!</p>
+    <p class="thanking_p" style="direction: rtl;text-align: center;font-size: 22px;font-family: NotoKufiArabic-Regular;">
+        شكرا جزيلا لرغبتك في المساهمة في تطوير معجم الرياض
+        <br>
+        هنا يمكنك إضافة مثال جديد أو الإبلاغ عن مثال لا تراه مناسبا
+        <br>
+        مشاركتك سيتم مراجعتها وستساهم في تطوير معجم الرياض!
+    </p>
     <form id="examples_search_form" action="/get_examples_setup_1" method="POST">
-        <label title="اكتب الكلمة مثل: 'يأكل'" for="word_input" class="word_label">الكلمة:</label>
+        <label title="اكتب الكلمة مثل: 'يأكل'" for="word_input" class="word_label">الكلمة</label>
         <input placeholder="مثال: يأكل" title="اكتب الكلمة مثل: 'يأكل'" type="text" id="word_input" class="word_input" name="word" value="{{word}}">
 
-        <label title="اكتب معنى الكلمة مثل: 'يتناول الطعام'" for="meaning_input" class="meaning_label">المعنى:</label>
+        <label title="اكتب معنى الكلمة مثل: 'يتناول الطعام'" for="meaning_input" class="meaning_label">المعنى</label>
         <input placeholder="مثال: يتناول الطعام" title="اكتب معنى الكلمة مثل: 'يتناول الطعام'" type="text" id="meaning_input" class="meaning_input" name="meaning" value="{{meaning}}">
 
-        <img src="static/images/drop_down.png" style="width: 20px;position: absolute;margin: 81px  0 0px 567px;">
-        <label  title="اختر نوع الكلمة, مثال : يأكل (فعل)" class="type_label" for="type-select">النوع:</label>
+        <img src="static/images/drop_down.png" style="width: 20px;position: absolute;margin: 81px  0 0px 577px;">        <label  title="اختر نوع الكلمة, مثال : يأكل (فعل)" class="type_label" for="type-select">النوع</label>
         <select title="اختر نوع الكلمة, مثال : يأكل (فعل)" class="dropdown-select" name="type-select" id="type-select">
             <option {% if word_type == 'Noun' %}selected{% endif %} value="Noun">اسم</option>
             <option {% if word_type == 'Verb' %}selected{% endif %} value="Verb">فعل</option>
             <option {% if word_type == 'Preposition' %}selected{% endif %} value="Preposition">حرف</option>
         </select>
 
-        <label title="اختر مصدر المثال" class="resource_type_lable">مصدر المثال:</label>
+        <label title="اختر مصدر المثال" class="resource_type_lable">مصدر المثال</label>
         <div class="type_button_container">
             <div id="news" title="الأخبار" class="type_button" onclick="toggleTypeButton(event, 'news')"><img title="الأخبار" class="resource_type_icon" src="static/images/News_icon.png" alt="News"></div>
             <div id="poetry" title="الشّعر العربي" class="type_button" onclick="toggleTypeButton(event, 'poetry')"><img title="الشّعر العربي" class="resource_type_icon" src="static/images/Poetry_icon.png" alt="Poetry"></div>
@@ -120,11 +117,11 @@
             <input type="hidden" id="type_hiddenInput" name="resource_type" value="all">
         </div>
 
-        <label  title="اكتب المثال" class="type_label" for="example">المثال:</label>
-        <input title="اكتب المثال" type="text" id="example" class="meaning_input" name="example" value="" style="margin-bottom: 30px;margin-top: 15px;width: 87%;">
+        <label title="اكتب المثال" class="type_label" for="example" style="margin-right: -10px;">المثال</label>
+        <input title="اكتب المثال" type="text" id="example" class="meaning_input" name="example" value="" style="margin-bottom: 30px;margin-top: 15px;width: 89%;">
 
-        <input type="submit" title="إضافة مثال جديد" onclick="submitForm('/contribute_in_alriyadh_dictionary_add',event)" value="إضافة" class="search-button" style="margin-bottom: 19px;">
-        <input type="submit" title="الإبلاغ عن المثال"  onclick="submitForm('/contribute_in_alriyadh_dictionary_report',event)" value="الإبلاغ" class="search-button" style="color: red;">
+        <input type="submit" title="إضافة مثال جديد" onclick="submitForm('/contribute_in_alriyadh_dictionary_add',event)" value="إضافة" class="search-button" style="padding: 0;margin-bottom: 19px;font-size: 19px;border-radius: 8px;background-color: aliceblue;">
+        <input type="submit" title="الإبلاغ عن المثال" onclick="submitForm('/contribute_in_alriyadh_dictionary_report',event)" value="الإبلاغ" class="search-button" style="color: red;padding: 0;font-size: 19px;margin-top: -7px;border-radius: 8px;background-color: aliceblue;">
     </form>
 
     <form id="set_mode_form" action="/set_mode" method="POST">

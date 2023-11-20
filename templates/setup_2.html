@@ -31,47 +31,47 @@
 
 <div class="container">
     <form action="/change_the_setup" method="post">
-        <button type="submit" name="destination" value="3" style="
-                        background: #222140;
-                        color: #ffffff;
-                        padding: 4px;
-                        font-size: 16px;
+        <button class="destination" type="submit" name="destination" value="3" style="
+                        padding: 0px;
+                        font-size: 14px;
                         display: inline-block;
-                        width: 180px;
+                        width: 203px;
                         margin-bottom: 5px;
                         cursor: pointer;
                         direction: rtl;
                         margin-left: 24px;
+                        font-family: 'NotoKufiArabic-Regular';
+                        border-radius: 8px;
                         ">شارك في تطوير معجم الرياض!</button>
-        <button type="submit" name="destination" value="2" style="
-                        background: #222140;
-                        color: #02fd00;
-                        padding: 4px;
-                        font-size: 16px;
+        <button class="destination active_destination" type="submit" name="destination" value="2" style="
+                        padding: 0px;
+                        font-size: 14px;
                         display: inline-block;
-                        margin-left: 266px;
-                        width: 160px;
+                        margin-left: 235px;
+                        width: 188px;
                         margin-bottom: 5px;
                         cursor: pointer;
+                        font-family: 'NotoKufiArabic-Regular';
+                        border-radius: 8px;
                         ">استخدم معاني معجم الرياض</button>
-        <button type="submit" name="destination" value="1" style="
-                        background: #222140;
-                        color: #ffffff;
-                        padding: 4px;
-                        font-size: 16px;
+        <button class="destination" type="submit" name="destination" value="1" style="
+                        padding: 0px;
+                        font-size: 14px;
                         display: inline-block;
-                        width: 160px;
+                        width: 140px;
                         margin-bottom: 5px;
                         cursor: pointer;
+                        font-family: 'NotoKufiArabic-Regular';
+                        border-radius: 8px;
                         ">أدخل المعاني بنفسك</button>
 
     </form>
     <form id="examples_search_form" action="/get_examples_setup_2" method="POST">
-        <label title="اكتب الكلمة مثل: 'يأكل'" for="word_input" class="word_label" >الكلمة:</label>
-        <input placeholder="مثال: يأكل"  type="text" id="word_input" class="word_input" name="word" value="{{word}}" {% if list_of_meanings_dicts %} readonly style="color: gray; cursor: not-allowed" title="اضغط على إفراغ لإدخال كلمة جديدة" {% else %} title="اكتب الكلمة مثل: 'يأكل'" {% endif %}>
+        <label title="اكتب الكلمة مثال: نجح" for="word_input" class="word_label" >الكلمة</label>
+        <input placeholder="مثال: نجح"  type="text" id="word_input" class="word_input" name="word" value="{{word}}" {% if list_of_meanings_dicts %} readonly style="color: gray; cursor: not-allowed" title="اضغط على إفراغ لإدخال كلمة جديدة" {% else %} title="اكتب الكلمة مثل: 'يأكل'" {% endif %}>
 
         <img src="static/images/drop_down.png" style="width: 21px;position: absolute;margin: 22px  0 0 34px;">
-        <label title="اختر معنى الكلمة" for="type-select" class="meaning_label">المعنى:</label>
+        <label title="اختر معنى الكلمة" for="type-select" class="meaning_label">المعنى</label>
         <select title="اختر معنى الكلمة" class="dropdown-select" name="meaning" id="type-select" {% if not list_of_meanings_dicts or list_of_meanings_dicts and word and examples %} style="color: gray; cursor: not-allowed" readonly {% endif %}>
             {% if not list_of_meanings_dicts %}
             <option>لعرض المعاني: قم بكتابة الكلمة ثم اضغط على "استرجاع المعاني"</option>
@@ -86,7 +86,7 @@
         </select>
 
 
-        <label title="اختر مصدر الأمثلة" class="resource_type_lable" >مصدر الأمثلة:</label>
+        <label title="اختر مصدر الأمثلة" class="resource_type_lable" >مصدر الأمثلة</label>
         <div class="type_button_container">
             <div id="news"  title="الأخبار" class="type_button" onclick="toggleTypeButton(event, 'news')"><img title="الأخبار" class="resource_type_icon" src="static/images/News_icon.png" alt="News"></div>
             <div id="poetry"  title="الشّعر العربي" class="type_button" onclick="toggleTypeButton(event, 'poetry')"><img title="الشّعر العربي" class="resource_type_icon" src="static/images/Poetry_icon.png" alt="Poetry"></div>
@@ -97,8 +97,7 @@
             <input type="hidden" id="type_hiddenInput" name="resource_type" value="{{resource_type}}">
         </div>
 
-        <input title="اضغط لإدخال كلمة جديدة" value="إفراغ" class="search-button" id="new_search_button" onclick="new_search()" style="margin: -47px 273px 0px 0px;color: rgb(228, 0, 0);background: gold;display: none;width: 43px;">
-        <input type="submit" id="search_submit" class="search-button" {% if list_of_meanings_dicts and word and examples %} style="cursor: not-allowed" disabled {% endif %}   {% if not word and not list_of_meanings_dicts %} value="استرجاع المعاني" title="استرجاع المعاني" {% else %} value="البحث عن الأمثلة" {% if list_of_meanings_dicts and word and examples %} title="اضغط على إفراغ لإدخال كلمة جديدة" {% else %} title="البحث عن الأمثلة" {% endif %} {% endif %}>
+        <input title="اضغط لإدخال كلمة جديدة" value="إفراغ" class="search-button" id="new_search_button" onclick="new_search()" style="margin: -45px 273px 0px 0px;color: rgb(228, 0, 0);background: gold;display: none;width: 63px;font-family: 'NotoKufiArabic-Regular';font-size: 18px;height: 27px;">        <input type="submit" id="search_submit" class="search-button" {% if list_of_meanings_dicts and word and examples %} style="cursor: not-allowed" disabled {% endif %}   {% if not word and not list_of_meanings_dicts %} value="استرجاع المعاني" title="استرجاع المعاني" {% else %} value="البحث عن الأمثلة" {% if list_of_meanings_dicts and word and examples %} title="اضغط على إفراغ لإدخال كلمة جديدة" {% else %} title="البحث عن الأمثلة" {% endif %} {% endif %}>
         <div id="overlay">
             <div id="loader"></div>
             <span style="direction: rtl">جارٍ البحث...</span>

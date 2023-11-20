@@ -32,19 +32,18 @@ header {
 .word_label{
     display: inline-block;
     float: right;
-    font-size: 31px;
-    margin-top: 1.5%;
+    font-size: 26px;
+    margin: 5px 0 0 3px;
     direction: rtl;
-    font-family: monospace;
+    font-family: NotoKufiArabic-Regular;
 }
 .meaning_label{
     display: inline-block;
     float: right;
-    font-size: 31px;
-    margin-top: 1.5%;
+    font-size: 26px;
+    margin: 5px 20px 0px 3px;
     direction: rtl;
-    font-family: monospace;
-    margin-right: 3%;
+    font-family: 'NotoKufiArabic-Regular';
 }
 
 
@@ -127,13 +126,13 @@ li {
     font-weight: bolder;
 }
 .search-button {
-    padding: 4px;
-    font-size: 21px;
+    padding: 1px;
+    font-size: 15px;
     text-align: center;
     text-decoration: none;
     background-color: #222140;
     color: #ffbd2c;
-    border-radius: 5px;
+    border-radius: 8px;
     transition: background-color 0.3s;
     cursor: pointer;
     font-weight: bold;
@@ -142,6 +141,7 @@ li {
     margin: -47px 92px 0 0;
     display: grid;
     float: right;
+    font-family: 'NotoKufiArabic-Regular';
 }
 
 header img {
@@ -210,7 +210,7 @@ ul::-webkit-scrollbar-thumb {
     border: 3px solid orange; /* creates padding around scroll thumb */
 }
 .word_to_highlight{
-    text-decoration: underline;
+    /*text-decoration: underline;*/
 }
 .examples_word{
     font-size: 36px;
@@ -312,12 +312,12 @@ ul::-webkit-scrollbar-thumb {
 }
 
 .resource_type_lable{
-    margin: 20px 380px 0 0;
+    margin: 10px 380px 0 0;
     display: inline-block;
     float: right;
-    font-size: 31px;
+    font-size: 26px;
     direction: rtl;
-    font-family: ui-monospace;
+    font-family: 'NotoKufiArabic-Regular';
 }
 input:disabled {
     border-color: gray;

@@ -17,17 +17,16 @@ header{
 
 }
 .resource_type_lable{
-    color: white;
+    color: #c8fcff;
 }
 .word_label{
-    color: white;
+    color: #c8fcff;
 }
 .meaning_label{
-    color: white;
+    color: #c8fcff;
 }
 .type_label{
-    margin-right: 5px;
-    color: white;
+    color: #c8fcff;
 }
 .lemma-custom-checkbox {
     border: 2px solid #cfcfcf;
@@ -64,5 +63,21 @@ ul::-webkit-scrollbar-thumb {
     color: #fc0232;
 }
 .word_to_highlight{
-    color: #fc0232;
+    background: #a6b661d4;
+    border: 1px;
+    border-radius: 7px;
+}
+.search-button {
+    background-color: #c8fcff;
+    color: black;
+}
+.thanking_p{
+    color: #c8fcff;
+}
+.destination{
+    background: #c8fcff;
+    color: black;
+}
+.active_destination{
+    color: #ff1717;
 }

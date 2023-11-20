@@ -32,25 +32,25 @@ header {
 .word_label{
     display: inline-block;
     float: right;
-    font-size: 31px;
-    margin-top: 1.5%;
+    font-size: 26px;
+    margin: 2px -12px 0 5px;
     direction: rtl;
-    font-family: monospace;
+    font-family: 'NotoKufiArabic-Regular';
 }
 .meaning_label{
     display: inline-block;
     float: right;
-    font-size: 31px;
-    margin-top: 1.5%;
+    font-size: 26px;
+    margin: 0px 0 0 5px;
     direction: rtl;
-    font-family: monospace;
+    font-family: 'NotoKufiArabic-Regular';
     margin-right: 3%;
 }
 
 
 .word_input{
     padding: 7px;
-    margin-top: 10px;
+    margin-top: 8px;
     box-sizing: border-box;
     border: 3px solid #222140;
     border-radius: 14px;
@@ -85,10 +85,10 @@ header {
 .type_label{
     display: inline-block;
     float: right;
-    font-size: 31px;
-    margin-top: 17px;
+    font-size: 26px;
+    margin: 8px 6px 0 5px;
     direction: rtl;
-    font-family: monospace;
+    font-family: 'NotoKufiArabic-Regular';
 }
 #sliderValue {
     margin-top: 3%;
@@ -124,15 +124,16 @@ li {
     font-size: 20px;
     font-family: 'NotoKufiArabic-Regular';
     font-weight: bolder;
+    color: black;
 }
 .search-button {
-    padding: 4px;
-    font-size: 21px;
+    padding: 0px;
+    font-size: 17px;
     text-align: center;
     text-decoration: none;
     background-color: #222140;
     color: #ffbd2c;
-    border-radius: 5px;
+    border-radius: 8px;
     transition: background-color 0.3s;
     cursor: pointer;
     font-weight: bold;
@@ -140,6 +141,7 @@ li {
     height: 4%;
     margin: 0% 45%;
     display: grid;
+    font-family: 'NotoKufiArabic-Regular';
 }
 
 header img {
@@ -207,8 +209,6 @@ ul::-webkit-scrollbar-thumb {
     border: 3px solid orange; /* creates padding around scroll thumb */
 }
 .word_to_highlight{
-    color: #00cfff;
-    text-decoration: underline;
 }
 .examples_word{
     font-size: 36px;
@@ -309,12 +309,12 @@ ul::-webkit-scrollbar-thumb {
 }
 
 .resource_type_lable{
-    margin: 20px 145px 0 0;
+    margin: 13px 157px 0 0;
     display: inline-block;
     float: right;
-    font-size: 31px;
+    font-size: 25px;
     direction: rtl;
-    font-family: ui-monospace;
+    font-family: 'NotoKufiArabic-Regular';
 }
 
 #overlay {

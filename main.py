@@ -1,5 +1,6 @@
 # Version 1.3
 import os
+import time
 from collections import defaultdict
 import re
 import requests
@@ -133,7 +134,7 @@ class MustashhedApp:
                             meaning_dict = item
                             type = item['pos']
                             word_with_diacr = item['word_with_diacr']
-                            if type == "None" or "V" in type:
+                            if "V" in type:
                                 self.word_type = "Verb"
                             elif "N" in type:
                                 self.word_type = "Noun"
@@ -339,6 +340,20 @@ class MustashhedApp:
 
         return embeddings
 
+    # def make_queries_embeddings(self, words, meaning, word_type):
+    #     query = f"{words[0]}:{meaning}" # Make only one query for the first word form .. as we don't need to make query for each word form
+    #     input_ids = self.tokenizer(query, return_tensors="pt", padding=True).to(device)
+    #     # Get the model's output
+    #     with torch.no_grad():
+    #         output = self.model(**input_ids)
+    #
+    #     # Get the embeddings from the output
+    #     queries_embeddings = output.last_hidden_state
+    #     # Get the Average over the 1st dim
+    #     queries_embeddings = torch.mean(queries_embeddings, dim=1)
+    #
+    #     return [queries_embeddings for word in words]
+
     def make_queries_embeddings(self, words, meaning, word_type):
         queries = [f"{word}:{meaning}" for word in words]
         input_ids = self.tokenizer(queries, return_tensors="pt", padding=True).to(device)
@@ -397,6 +412,7 @@ class MustashhedApp:
             current_resource_types.append(resource_type)
 
         for _type in current_resource_types:
+            start_time = time.time()
             all_forms_of_word = self.get_all_forms_of_word(_type, lemma_custom_checkbox, word, word_type)
             print(all_forms_of_word)
             self.write_to_logs(all_forms_of_word)
@@ -445,6 +461,7 @@ class MustashhedApp:
                     self.write_to_logs(f"word:{word_form}, example:{self.sentences[_type][sentence_index]}")
                     distances.append(distance)
                 current_resource_type_all_words_forms_examples.append((word_form, words_form_examples, distances))
+            print("--- %s seconds ---" % (time.time() - start_time))
 
             examples_dict[_type] = current_resource_type_all_words_forms_examples
 
