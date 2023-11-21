@@ -24,8 +24,10 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(device)
 
 arabic_stop_words = ['اللاتي', 'كلا', 'ولكن', 'عسى', 'بهما', 'فيما', 'لكي', 'لدى', 'لستما', 'كلما', 'نحن', 'سوى', 'الذي', 'كيتما', 'هم', 'هؤلاء', 'وهو', 'بين', 'ليس', 'هيت', 'أنتن', 'اللواتي', 'أيك', 'إذ', 'غير', 'كل', 'هذي', 'أولئك', 'هيا', 'بماذا', 'أولالك', 'فإذا', 'إليكما', 'ذان', 'هذا', 'ذينك', 'حاشا', 'ثمة', 'متى', 'بلى', 'ولا', 'أينما', 'على', 'كي', 'ليسوا', 'ذلكن', 'وما', 'أما', 'هناك', 'كأي', 'لها', 'ألا', 'لكم', 'اللذين', 'أولائك', 'ليستا', 'لو', 'أولئكم', 'عليه', 'فمن', 'إذن', 'فيه', 'ذانك', 'أقل', 'لهن', 'لستن', 'بهن', 'لاسيما', 'هنا', 'وإذ', 'هذين', 'بمن', 'بعد', 'ذي', 'أنتم', 'أيكما', 'لي', 'حيث', 'نحو', 'أنت', 'ماذا', 'إذما', 'إنها', 'إنه', 'أيكم', 'تي', 'تلكما', 'إلا', 'بس', 'حين', 'عندما', 'عن', 'كليهما', 'يا', 'كيفما', 'أولاء', 'أيها', 'ذو', 'أيا', 'به', 'كما', 'لهم', 'عند', 'إلينا', 'لسنا', 'ذلكما', 'أيهما', 'اللائي', 'بخ', 'كيت', 'بكم', 'هاك', 'بعض', 'الذين', 'كم', 'هيهات', 'أيهم', 'هاهنا', 'ولو', 'أنى', 'لكما', 'لكنما', 'وإذا', 'بكما', 'هو', 'إنما', 'سوف', 'لولا', 'كلاهما', 'لنا', 'أ', 'ما', 'لا', 'هل', 'ليسا', 'ته', 'تلك', 'اللتيا', 'فيها', 'هلا', 'ذا', 'أوه', 'ذه', 'اللتان', 'أي', 'عدا', 'فيم', 'هكذا', 'فلا', 'ذين', 'ها', 'أيه', 'إذا', 'دون', 'إن', 'لم', 'حبذا', 'أكثر', 'إليكم', 'ذوا', 'أف', 'إلى', 'كذا', 'بل', 'إلا أن', 'في', 'كأين', 'ومن', 'ذواتا', 'بنا', 'أيهن', 'عل', 'كليكما', 'أو', 'اللتين', 'ذاك', 'إليك', 'نعم', 'هنالك', 'خلا', 'أولائكم', 'كأن', 'كلتا', 'ذلك', 'هاته', 'هن', 'مع', 'منذ', 'كذلك', 'بما', 'لسن', 'أم', 'تلكم', 'أيكن', 'قد', 'هما', 'لستم', 'منها', 'بها', 'ذلكم', 'أن', 'بكن', 'مهما', 'كأنما', 'بك', 'اللذان', 'لوما', 'كيف', 'حتى', 'أين', 'بهم', 'تينك', 'ثم', 'له', 'من', 'ليست', 'شتان', 'أنا', 'ذواتي', 'لك', 'أنتما', 'مذ', 'لكن', 'مما', 'ريث', 'وإن', 'هذان', 'مه', 'بيد', 'فإن', 'حيثما', 'إما', 'لهما', 'إليكن', 'تين', 'بي', 'لكيلا', 'لن', 'عليك', 'لئن', 'ليت', 'لست', 'لما', 'منه', 'هي', 'ممن', 'هذه', 'لعل']
-MAX_NUM_OF_EXAMPLES_PER_WORD = 5
-
+MAX_NUM_OF_EXAMPLES_PER_WORD = 10000
+EXAMPLE_THRESHOLD = 0.4
+REMOVE_SIMILAR_EXAMPLES_THRESHOLD = 0.000005
+TEXT_WINDOW_SIZE = 9
 SUPPORTED_EXAMPLES_TYPES = ["news","quraan","poetry","hadith"]
 # SUPPORTED_EXAMPLES_TYPES = ["poetry","hadith","quraan"]
 
@@ -94,17 +96,6 @@ class MustashhedApp:
 
             try:
                 self.examples = self.get_examples_with_faiss(self.word, self.meaning, self.word_type, self.resource_type)
-
-                # Sorting the examples based on the distance from the query (not by the type)
-                for word in self.examples.keys():
-                    self.examples[word] = sorted(self.examples[word], key=lambda x: x['distance'], reverse=False)
-
-                for word in self.examples.keys():
-                    examples = []
-                    for dic in self.examples[word][:MAX_NUM_OF_EXAMPLES_PER_WORD]:
-                        examples.append(dic['example'])
-                    examples_list.append((word,examples))
-                self.examples = examples_list
             except:
                 print("Exception in get_examples_setup_1()")
                 self.write_to_logs("Exception in get_examples_setup_1()")
@@ -114,7 +105,7 @@ class MustashhedApp:
             return render_template(f'setup_1.html',examples=[], word="", meaning="", mode="light", word_type="Noun", resource_type = "all")
 
     def get_examples_setup_2(self):
-        try:
+        # try:
             self.word = request.form.get('word')
             self.meaning = request.form.get('meaning')
             self.resource_type = request.form.get('resource_type')
@@ -127,7 +118,7 @@ class MustashhedApp:
                 return render_template(f'setup_{self.setup}.html',list_of_meanings_dicts=self.list_of_meanings_dicts, examples=None, word=self.word,meaning=self.meaning, word_type= self.word_type,resource_type = self.resource_type , mode=self.mode)
 
             else:
-                try:
+                # try:
                     self.meaning = request.form.get('meaning')
                     for item in self.list_of_meanings_dicts:
                         if self.meaning == item['meaning']: # becuase the meaning in the UI is consists from word_with_diacr+ space+meaning
@@ -145,23 +136,12 @@ class MustashhedApp:
                             break
                     self.meaning = word_with_diacr +": "+ self.meaning
                     self.examples = self.get_examples_with_faiss(self.word, self.meaning, self.word_type, self.resource_type)
-
-                    # Sorting the examples based on the distance from the query (not by the type)
-                    for word in self.examples.keys():
-                        self.examples[word] = sorted(self.examples[word], key=lambda x: x['distance'], reverse=False)
-
-                    for word in self.examples.keys():
-                        examples = []
-                        for dic in self.examples[word][:MAX_NUM_OF_EXAMPLES_PER_WORD]:
-                            examples.append(dic['example'])
-                        examples_list.append((word,examples))
-                    self.examples = examples_list
-                except:
-                    self.write_to_logs("Exception in get_examples_setup_2()")
+                # except:
+                #     self.write_to_logs("Exception in get_examples_setup_2()")
 
             return render_template(f'setup_{self.setup}.html',list_of_meanings_dicts=[meaning_dict], examples=self.examples, word=self.word,meaning="",resource_type = self.resource_type , mode=self.mode)
-        except:
-            return render_template(f'setup_1.html',examples=[], word="", meaning="", mode="light", word_type="Noun", resource_type = "all")
+        # except:
+        #     return render_template(f'setup_1.html',examples=[], word="", meaning="", mode="light", word_type="Noun", resource_type = "all")
 
     def contribute_in_alriyadh_dictionary_add(self):
         try:
@@ -437,10 +417,28 @@ class MustashhedApp:
                 # Ensure that (filtered_embeddings) is a 2D array of shape (num_embeddings, embedding_dim)
                 embedding_np = filtered_embeddings.cpu().numpy()
 
-                # Create a Faiss index
-                index = faiss.IndexFlatL2(embedding_np.shape[1])  # L2 (Euclidean) distance index
+                # # Create a Faiss index
+                # index = faiss.IndexFlatL2(embedding_np.shape[1])  # L2 (Euclidean) distance index
+                #
+                # # Add the embeddings to the Faiss index
+                # index.add(embedding_np)
+                #
+                # # Define the number of nearest neighbors you want to retrieve
+                # k = len(self.inverted_indices[_type][word_form])
+                #
+                # # Define a query embedding for which you want to find similar embeddings
+                # query_embedding = np.array(query_embedding.cpu(), dtype=np.float32)  # Replace with your query embedding
+                #
+                # # Perform a search to find the nearest neighbors
+                # distances, indices = index.search(query_embedding, k)
 
-                # Add the embeddings to the Faiss index
+                # Create a Faiss index with Cosine similarity
+                index = faiss.IndexFlatIP(embedding_np.shape[1])  # Inner product (Cosine similarity) index
+
+                # Normalize the embeddings to unit length for Cosine similarity
+                faiss.normalize_L2(embedding_np)
+
+                # Add your embeddings to the Faiss index
                 index.add(embedding_np)
 
                 # Define the number of nearest neighbors you want to retrieve
@@ -448,19 +446,30 @@ class MustashhedApp:
 
                 # Define a query embedding for which you want to find similar embeddings
                 query_embedding = np.array(query_embedding.cpu(), dtype=np.float32)  # Replace with your query embedding
+                query_embedding /= np.linalg.norm(query_embedding)  # Normalize the query embedding to unit length
 
                 # Perform a search to find the nearest neighbors
                 distances, indices = index.search(query_embedding, k)
 
-                new_distances, new_indices = self.remove_near_distances(distances=distances.tolist()[0], indices = indices.tolist()[0], threshold = 3)
-                faiss_indices = new_indices
-                distances = []
-                for faiss_index ,distance in zip(faiss_indices,new_distances):
+                # Set a cosine similarity threshold between 0 and 1
+                cosine_similarity_threshold = EXAMPLE_THRESHOLD  # Adjust the threshold as needed
+
+                # Filter the results based on the cosine similarity threshold
+                indices = [i for i, sim in zip(indices[0], distances[0]) if sim >= cosine_similarity_threshold]
+                distances = [sim for i, sim in zip(indices, distances[0]) if sim >= cosine_similarity_threshold]
+
+
+                distances, indices = self.remove_near_distances(indices = indices, distances=distances, threshold = REMOVE_SIMILAR_EXAMPLES_THRESHOLD)
+
+                faiss_indices = indices
+                faiss_distances = distances
+                orignal_sentences = []
+                for faiss_index ,faiss_distance in zip(faiss_indices,faiss_distances):
                     sentence_index = faiss_index_to_sentence_index_dict[faiss_index]
                     words_form_examples.append(self.generate_html_sentence(sentence=self.sentences[_type][sentence_index], word_to_highlight=word_form,example_type=_type,sentence_index=sentence_index))
+                    orignal_sentences.append(self.sentences[_type][sentence_index])
                     self.write_to_logs(f"word:{word_form}, example:{self.sentences[_type][sentence_index]}")
-                    distances.append(distance)
-                current_resource_type_all_words_forms_examples.append((word_form, words_form_examples, distances))
+                current_resource_type_all_words_forms_examples.append((word_form, words_form_examples, faiss_distances,orignal_sentences))
             print("--- %s seconds ---" % (time.time() - start_time))
 
             examples_dict[_type] = current_resource_type_all_words_forms_examples
@@ -469,14 +478,31 @@ class MustashhedApp:
         words_examples = defaultdict(list)
 
         for examples_type in examples_dict.keys():
-            for word_examples_distances_tuple in examples_dict[examples_type]:
-                word, examples, distances = word_examples_distances_tuple
-                for example,distance in zip(examples, distances):
-                    words_examples[word].append({"example":example,"distance":distance,"type":examples_type})
+            for word_examples_distances_orignal_sentences_tuple in examples_dict[examples_type]:
+                word, examples, distances,orignal_sentences = word_examples_distances_orignal_sentences_tuple
+                for example,distance,orignal_sentence in zip(examples, distances, orignal_sentences):
+                    words_examples[word].append({"example":example,"distance":distance,"type":examples_type,'orignal_sentence':orignal_sentence})
 
-        return words_examples
+        # Sorting the examples based on the distance from the query (not by the type)
+        for word in words_examples.keys():
+            words_examples[word] = sorted(words_examples[word], key=lambda x: x['distance'], reverse=True)
 
-    def extract_window_around_word(self, text, target_word, window_size=8):
+        examples_list = []
+        for word in words_examples.keys():
+            examples = []
+            print(f"Word:{word}")
+            self.write_to_logs(f"Word:{word}")
+            for dic in words_examples[word][:MAX_NUM_OF_EXAMPLES_PER_WORD]:
+                examples.append(dic['example'])
+                print(f"\t-sentence:{dic['orignal_sentence']}\n\t- distance:{dic['distance']}\n\n")
+                self.write_to_logs(f"\t-sentence:{dic['orignal_sentence']}\n\t- distance:{dic['distance']}\n\n")
+            print(f"-------------------")
+            self.write_to_logs(f"-------------------")
+            examples_list.append((word,examples))
+
+        return examples_list
+
+    def extract_window_around_word(self, text, target_word, window_size=TEXT_WINDOW_SIZE):
         # Split the text into words
         words = text.split()
 
@@ -517,9 +543,9 @@ class MustashhedApp:
         all_forms_of_word = list(set(all_forms_of_word))
         all_forms_of_word = [word_form for word_form in all_forms_of_word if
                              len(self.inverted_indices[_type][word_form]) > 0]
-        if word in all_forms_of_word:
-            all_forms_of_word.remove(word)
-            all_forms_of_word.insert(0, word)
+        # if word in all_forms_of_word:
+        #     all_forms_of_word.remove(word)
+        #     all_forms_of_word.insert(0, word)
         return all_forms_of_word
 
     def generate_html_sentence(self, sentence, word_to_highlight,example_type,sentence_index):

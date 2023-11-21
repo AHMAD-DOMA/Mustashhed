@@ -120,8 +120,12 @@
         <label title="اكتب المثال" class="type_label" for="example" style="margin-right: -10px;">المثال</label>
         <input title="اكتب المثال" type="text" id="example" class="meaning_input" name="example" value="" style="margin-bottom: 30px;margin-top: 15px;width: 89%;">
 
+
         <input type="submit" title="إضافة مثال جديد" onclick="submitForm('/contribute_in_alriyadh_dictionary_add',event)" value="إضافة" class="search-button" style="padding: 0;margin-bottom: 19px;font-size: 19px;border-radius: 8px;background-color: aliceblue;">
         <input type="submit" title="الإبلاغ عن المثال" onclick="submitForm('/contribute_in_alriyadh_dictionary_report',event)" value="الإبلاغ" class="search-button" style="color: red;padding: 0;font-size: 19px;margin-top: -7px;border-radius: 8px;background-color: aliceblue;">
+        <div id="overlay" style="    font-size: 27px;    font-family: 'NotoKufiArabic-Regular';    display: none;">
+            <span style="direction: rtl;">تم.. شكرا جزيلا!</span>
+        </div>
     </form>
 
     <form id="set_mode_form" action="/set_mode" method="POST">
@@ -160,6 +164,13 @@
             }, 150);
             return
         }
+        var overlay = document.getElementById("overlay");
+
+        // Display overlay with flex for 0.5 seconds
+        overlay.style.display = "flex";
+        setTimeout(function() {
+            overlay.style.display = "none";
+        }, 1000);
         form.submit();
     }
     document.addEventListener("DOMContentLoaded", function () {
