@@ -1,5 +1,5 @@
-MODEL_NAME = "arabert_base"
-MODEL_NAME = "arabert_large"
+# MODEL_NAME = "arabert_base"
+# MODEL_NAME = "arabert_large"
 MODEL_NAME = "Arabic_KW_Mdel"
 
 MAX_NUM_OF_EXAMPLES_PER_WORD = 1000
