@@ -249,15 +249,16 @@ class MustashhedApp:
             for i in range(len(data)):
                 if len(data[i]['senses'])>0:
                     for dic in data[i]['senses']:
-                        meaning_dict = {}
-                        meaning_dict["id"] = id
-                        meaning_dict["meaning"] = str(dic['definition']['textRepresentations'][0]['form'])
-                        meaning_dict['nonDiacriticsLemma'] = str(data[i]['nonDiacriticsLemma'])
-                        meaning_dict["word_with_diacr"] = str(data[i]['nonDiacriticsLemma'])
-                        meaning_dict["pos"] = str(data[i]['pos'])
-                        if len(meaning_dict["meaning"]) > 0:
-                            list_of_meanings_dicts.append(meaning_dict)
-                            id+=1
+                        if word == dediac_ar(str(data[i]['nonDiacriticsLemma'])):
+                            meaning_dict = {}
+                            meaning_dict["id"] = id
+                            meaning_dict["meaning"] = str(dic['definition']['textRepresentations'][0]['form'])
+                            meaning_dict['nonDiacriticsLemma'] = str(data[i]['nonDiacriticsLemma'])
+                            meaning_dict["word_with_diacr"] = str(data[i]['nonDiacriticsLemma'])
+                            meaning_dict["pos"] = str(data[i]['pos'])
+                            if len(meaning_dict["meaning"]) > 0:
+                                list_of_meanings_dicts.append(meaning_dict)
+                                id+=1
 
         return list_of_meanings_dicts
 
