@@ -10,11 +10,11 @@ header{
     background-color: #123b48
 }
 .word_input{
-
+    background: #fffffff2;
 }
 
 .meaning_input{
-
+    background: #fffffff2;
 }
 .resource_type_lable{
     color: #c8fcff;
@@ -50,7 +50,7 @@ ul::-webkit-scrollbar-thumb {
 }
 
 .dropdown-select {
-
+    background: #fffffff2;
 }
 .type_button.active {
     border:2px solid #e41320;

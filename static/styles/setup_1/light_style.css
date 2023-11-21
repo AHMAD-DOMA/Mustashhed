@@ -9,7 +9,7 @@ header{
     background-color: #a9cae9
 }
 .word_input{
-    border-color: #0f405d
+    background: #fffffff2;
 }
 .word_to_highlight{
     background: #fffe0063;
@@ -17,7 +17,8 @@ header{
     border-radius: 7px;
 }
 .meaning_input{
-    border-color: #0f405d
+    border-color: #0f405d;
+    background: #fffffff2;
 }
 .type_label{
     color: #0f405d;
@@ -53,7 +54,8 @@ ul::-webkit-scrollbar-thumb {
 }
 
 .dropdown-select {
-    border-color: #0f405d
+    border-color: #0f405d;
+    background: #fffffff2;
 }
 .type_button.active {
     border:2px solid #e41320;

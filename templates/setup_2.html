@@ -79,7 +79,7 @@
             {% if list_of_meanings_dicts %}
             {% for item in list_of_meanings_dicts %}
             <option value="{{ item['meaning'] }}" title="{{ item['word_with_diacr'] + ': ' + item['meaning'] }}">
-                {{ item['word_with_diacr'] + ": " + ' '.join(item['meaning'].split()[:7]) + ('...' if item['meaning'].split()|length > 7 else '') }}
+                {{ item['html'] }}
             </option>
             {% endfor %}
             {% endif %}

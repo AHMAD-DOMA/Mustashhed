@@ -1,3 +1,7 @@
+MODEL_NAME = "arabert_base"
+MODEL_NAME = "arabert_large"
+MODEL_NAME = "Arabic_KW_Mdel"
+
 MAX_NUM_OF_EXAMPLES_PER_WORD = 1000
 EXAMPLE_THRESHOLD = 0.0
 REMOVE_SIMILAR_EXAMPLES_THRESHOLD = 0.000005
@@ -249,12 +253,14 @@ class MustashhedApp:
             for i in range(len(data)):
                 if len(data[i]['senses'])>0:
                     for dic in data[i]['senses']:
-                        if word == dediac_ar(str(data[i]['nonDiacriticsLemma'])):
+                        if dediac_ar(word) == dediac_ar(str(data[i]['nonDiacriticsLemma'])):
                             meaning_dict = {}
                             meaning_dict["id"] = id
                             meaning_dict["meaning"] = str(dic['definition']['textRepresentations'][0]['form'])
                             meaning_dict['nonDiacriticsLemma'] = str(data[i]['nonDiacriticsLemma'])
                             meaning_dict["word_with_diacr"] = str(data[i]['nonDiacriticsLemma'])
+                            meaning_dict["html"] =  self.extract_window_around_word(text=meaning_dict['word_with_diacr'] + ": " + meaning_dict["meaning"],target_word=meaning_dict['word_with_diacr']+ ":",above_n_chars=55,window_size=7)
+
                             meaning_dict["pos"] = str(data[i]['pos'])
                             if len(meaning_dict["meaning"]) > 0:
                                 list_of_meanings_dicts.append(meaning_dict)
@@ -278,19 +284,26 @@ class MustashhedApp:
                 break
 
     def get_model_and_tokenizer(self):
-        model_name = "static/resources/bert-base-arabertv02"
+        if MODEL_NAME == "arabert_base":
+            saved_model_path = "static/resources/arabert_base/bert-base-arabertv02"
+            huggingface_hub_model_name = "aubmindlab/bert-base-arabertv02"
+        if MODEL_NAME == "arabert_large":
+            saved_model_path = "static/resources/arabert_large/bert-large-arabertv02"
+            huggingface_hub_model_name = "aubmindlab/bert-large-arabertv02"
+        if MODEL_NAME == "Arabic_KW_Mdel":
+            saved_model_path = "static/resources/Arabic_KW_Mdel/Arabic-KW-Mdel"
+            huggingface_hub_model_name = "medmediani/Arabic-KW-Mdel"
 
-        if os.path.exists(model_name) and os.path.isdir(model_name):
-            tokenizer = AutoTokenizer.from_pretrained(model_name)
-            model = AutoModel.from_pretrained(model_name)
+        if os.path.exists(saved_model_path) and os.path.isdir(saved_model_path):
+            tokenizer = AutoTokenizer.from_pretrained(saved_model_path)
+            model = AutoModel.from_pretrained(saved_model_path)
         else:
-            model_name = "aubmindlab/bert-base-arabertv02"
 
-            tokenizer = AutoTokenizer.from_pretrained(model_name)
-            model = AutoModel.from_pretrained(model_name)
+            tokenizer = AutoTokenizer.from_pretrained(huggingface_hub_model_name)
+            model = AutoModel.from_pretrained(huggingface_hub_model_name)
 
-            tokenizer.save_pretrained("static/resources/bert-base-arabertv02")
-            model.save_pretrained("static/resources/bert-base-arabertv02")
+            tokenizer.save_pretrained(saved_model_path)
+            model.save_pretrained(saved_model_path)
 
 
         return model.to(device), tokenizer
@@ -301,18 +314,18 @@ class MustashhedApp:
         all_lenght = 0
         for _type in tqdm(SUPPORTED_EXAMPLES_TYPES,desc="get_all_inverted_indices()"):
             # Load the list from the file
-            with open(f"static/resources/{_type}/inverted_index.pkl", 'rb') as file:
+            with open(f"static/resources/{MODEL_NAME}/{_type}/inverted_index.pkl", 'rb') as file:
                 inverted_indices[_type] = pickle.load(file)
-                # print(_type,len(inverted_indices[_type]))
+                print(_type,len(inverted_indices[_type]))
                 all_lenght+=len(inverted_indices[_type])
-        # print(f"all_lenght:{all_lenght}")
+        print(f"all_lenght:{all_lenght}")
         return inverted_indices
 
     def get_types_metadata(self):
         types_metadata = {}
         current_types_require_metadata = [_type for _type in EXAMPLES_TYPES_REQUIRE_METADATA if _type in SUPPORTED_EXAMPLES_TYPES]
         for _type in tqdm(current_types_require_metadata,desc="get_types_metadata()"):
-            with open(f"static/resources/{_type}/{_type}_index_to_meta_data_dict.pkl", 'rb') as file:
+            with open(f"static/resources/{MODEL_NAME}/{_type}/{_type}_index_to_meta_data_dict.pkl", 'rb') as file:
                 types_metadata[_type] = pickle.load(file)
         return types_metadata
 
@@ -320,16 +333,16 @@ class MustashhedApp:
         sentences = {}
         for _type in tqdm(SUPPORTED_EXAMPLES_TYPES,desc="get_all_sentences()"):
             # Load the list from the file
-            with open(f"static/resources/{_type}/Processed_sentences.pkl", 'rb') as file:
+            with open(f"static/resources/{MODEL_NAME}/{_type}/Processed_sentences.pkl", 'rb') as file:
                 sentences[_type] = pickle.load(file)
-                # print(_type,len(sentences[_type]))
+                print(_type,len(sentences[_type]))
 
         return sentences
 
     def get_all_embeddings(self):
         embeddings = {}
         for _type in tqdm(SUPPORTED_EXAMPLES_TYPES,desc="get_all_embeddings()"):
-            loaded_tensor_dict = torch.load(f"static/resources/{_type}/embeddings.pt",map_location=device)
+            loaded_tensor_dict = torch.load(f"static/resources/{MODEL_NAME}/{_type}/embeddings.pt",map_location=device)
             embeddings_list = []
             # Iterate over the dictionary values (tensors) and add them to the list
             for tensor_list in loaded_tensor_dict.values():
@@ -572,34 +585,37 @@ class MustashhedApp:
 
         return examples_list
 
-    def extract_window_around_word(self, text, target_word, window_size=TEXT_WINDOW_SIZE):
-        # Split the text into words
-        words = text.split()
+    def extract_window_around_word(self, text, target_word,above_n_chars, window_size=TEXT_WINDOW_SIZE):
+        if len(text) > above_n_chars:
+            # Split the text into words
+            words = text.split()
 
-        # Find the index of the target word
-        try:
-            word_index = words.index(target_word)
-        except:
-            # Target word not found in the text
+            # Find the index of the target word
+            try:
+                word_index = words.index(target_word)
+            except:
+                # Target word not found in the text
+                return text
+
+            # Calculate the start and end indices for the window
+            start_index = max(0, word_index - window_size)
+            end_index = min(len(words), word_index + window_size + 1)
+
+            # Extract the window around the target word
+            window = words[start_index:end_index]
+
+            # Join the words in the window to form the final text
+            result_text = ' '.join(window)
+
+            if start_index > 0:
+                result_text = "..." + result_text
+
+            if end_index < len(words):
+                result_text = result_text +"..."
+
+            return result_text
+        else:
             return text
-
-        # Calculate the start and end indices for the window
-        start_index = max(0, word_index - window_size)
-        end_index = min(len(words), word_index + window_size + 1)
-
-        # Extract the window around the target word
-        window = words[start_index:end_index]
-
-        # Join the words in the window to form the final text
-        result_text = ' '.join(window)
-
-        if start_index != 0:
-            result_text = "..." + result_text
-
-        if end_index != len(text)-1:
-            result_text = result_text +"..."
-
-        return result_text
 
     def get_all_forms_of_word(self, _type, lemma_custom_checkbox, word, word_type):
         all_forms_of_word = []
@@ -620,7 +636,7 @@ class MustashhedApp:
 
     def generate_html_sentence(self, sentence, word_to_highlight,example_type,sentence_index,distance):
         orignal_sentence = sentence
-        sentence = self.extract_window_around_word(sentence,word_to_highlight)
+        sentence = self.extract_window_around_word(sentence,word_to_highlight,above_n_chars=150)
         if example_type == "quraan":
             meta_data = self.types_metadata['quraan'][sentence_index]
             sentence = "﴿ "+sentence+" ﴾" + f" [{meta_data['sura']}:{meta_data['aya']}]"
