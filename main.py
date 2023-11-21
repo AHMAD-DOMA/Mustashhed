@@ -24,8 +24,8 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(device)
 
 arabic_stop_words = ['اللاتي', 'كلا', 'ولكن', 'عسى', 'بهما', 'فيما', 'لكي', 'لدى', 'لستما', 'كلما', 'نحن', 'سوى', 'الذي', 'كيتما', 'هم', 'هؤلاء', 'وهو', 'بين', 'ليس', 'هيت', 'أنتن', 'اللواتي', 'أيك', 'إذ', 'غير', 'كل', 'هذي', 'أولئك', 'هيا', 'بماذا', 'أولالك', 'فإذا', 'إليكما', 'ذان', 'هذا', 'ذينك', 'حاشا', 'ثمة', 'متى', 'بلى', 'ولا', 'أينما', 'على', 'كي', 'ليسوا', 'ذلكن', 'وما', 'أما', 'هناك', 'كأي', 'لها', 'ألا', 'لكم', 'اللذين', 'أولائك', 'ليستا', 'لو', 'أولئكم', 'عليه', 'فمن', 'إذن', 'فيه', 'ذانك', 'أقل', 'لهن', 'لستن', 'بهن', 'لاسيما', 'هنا', 'وإذ', 'هذين', 'بمن', 'بعد', 'ذي', 'أنتم', 'أيكما', 'لي', 'حيث', 'نحو', 'أنت', 'ماذا', 'إذما', 'إنها', 'إنه', 'أيكم', 'تي', 'تلكما', 'إلا', 'بس', 'حين', 'عندما', 'عن', 'كليهما', 'يا', 'كيفما', 'أولاء', 'أيها', 'ذو', 'أيا', 'به', 'كما', 'لهم', 'عند', 'إلينا', 'لسنا', 'ذلكما', 'أيهما', 'اللائي', 'بخ', 'كيت', 'بكم', 'هاك', 'بعض', 'الذين', 'كم', 'هيهات', 'أيهم', 'هاهنا', 'ولو', 'أنى', 'لكما', 'لكنما', 'وإذا', 'بكما', 'هو', 'إنما', 'سوف', 'لولا', 'كلاهما', 'لنا', 'أ', 'ما', 'لا', 'هل', 'ليسا', 'ته', 'تلك', 'اللتيا', 'فيها', 'هلا', 'ذا', 'أوه', 'ذه', 'اللتان', 'أي', 'عدا', 'فيم', 'هكذا', 'فلا', 'ذين', 'ها', 'أيه', 'إذا', 'دون', 'إن', 'لم', 'حبذا', 'أكثر', 'إليكم', 'ذوا', 'أف', 'إلى', 'كذا', 'بل', 'إلا أن', 'في', 'كأين', 'ومن', 'ذواتا', 'بنا', 'أيهن', 'عل', 'كليكما', 'أو', 'اللتين', 'ذاك', 'إليك', 'نعم', 'هنالك', 'خلا', 'أولائكم', 'كأن', 'كلتا', 'ذلك', 'هاته', 'هن', 'مع', 'منذ', 'كذلك', 'بما', 'لسن', 'أم', 'تلكم', 'أيكن', 'قد', 'هما', 'لستم', 'منها', 'بها', 'ذلكم', 'أن', 'بكن', 'مهما', 'كأنما', 'بك', 'اللذان', 'لوما', 'كيف', 'حتى', 'أين', 'بهم', 'تينك', 'ثم', 'له', 'من', 'ليست', 'شتان', 'أنا', 'ذواتي', 'لك', 'أنتما', 'مذ', 'لكن', 'مما', 'ريث', 'وإن', 'هذان', 'مه', 'بيد', 'فإن', 'حيثما', 'إما', 'لهما', 'إليكن', 'تين', 'بي', 'لكيلا', 'لن', 'عليك', 'لئن', 'ليت', 'لست', 'لما', 'منه', 'هي', 'ممن', 'هذه', 'لعل']
-MAX_NUM_OF_EXAMPLES_PER_WORD = 10000
-EXAMPLE_THRESHOLD = 0.4
+MAX_NUM_OF_EXAMPLES_PER_WORD = 1000
+EXAMPLE_THRESHOLD = 0.0
 REMOVE_SIMILAR_EXAMPLES_THRESHOLD = 0.000005
 TEXT_WINDOW_SIZE = 9
 SUPPORTED_EXAMPLES_TYPES = ["news","quraan","poetry","hadith"]
@@ -92,7 +92,6 @@ class MustashhedApp:
             self.meaning = request.form.get('meaning')
             self.resource_type = request.form.get('resource_type')
             self.word_type = request.form['type-select']
-            examples_list = []
 
             try:
                 self.examples = self.get_examples_with_faiss(self.word, self.meaning, self.word_type, self.resource_type)
@@ -105,7 +104,7 @@ class MustashhedApp:
             return render_template(f'setup_1.html',examples=[], word="", meaning="", mode="light", word_type="Noun", resource_type = "all")
 
     def get_examples_setup_2(self):
-        # try:
+        try:
             self.word = request.form.get('word')
             self.meaning = request.form.get('meaning')
             self.resource_type = request.form.get('resource_type')
@@ -118,7 +117,7 @@ class MustashhedApp:
                 return render_template(f'setup_{self.setup}.html',list_of_meanings_dicts=self.list_of_meanings_dicts, examples=None, word=self.word,meaning=self.meaning, word_type= self.word_type,resource_type = self.resource_type , mode=self.mode)
 
             else:
-                # try:
+                try:
                     self.meaning = request.form.get('meaning')
                     for item in self.list_of_meanings_dicts:
                         if self.meaning == item['meaning']: # becuase the meaning in the UI is consists from word_with_diacr+ space+meaning
@@ -136,12 +135,12 @@ class MustashhedApp:
                             break
                     self.meaning = word_with_diacr +": "+ self.meaning
                     self.examples = self.get_examples_with_faiss(self.word, self.meaning, self.word_type, self.resource_type)
-                # except:
-                #     self.write_to_logs("Exception in get_examples_setup_2()")
+                except:
+                    self.write_to_logs("Exception in get_examples_setup_2()")
 
             return render_template(f'setup_{self.setup}.html',list_of_meanings_dicts=[meaning_dict], examples=self.examples, word=self.word,meaning="",resource_type = self.resource_type , mode=self.mode)
-        # except:
-        #     return render_template(f'setup_1.html',examples=[], word="", meaning="", mode="light", word_type="Noun", resource_type = "all")
+        except:
+            return render_template(f'setup_1.html',examples=[], word="", meaning="", mode="light", word_type="Noun", resource_type = "all")
 
     def contribute_in_alriyadh_dictionary_add(self):
         try:
@@ -284,10 +283,14 @@ class MustashhedApp:
 
     def get_all_inverted_indices(self):
         inverted_indices = {}
+        all_lenght = 0
         for _type in tqdm(SUPPORTED_EXAMPLES_TYPES,desc="get_all_inverted_indices()"):
             # Load the list from the file
             with open(f"static/resources/{_type}/inverted_index.pkl", 'rb') as file:
                 inverted_indices[_type] = pickle.load(file)
+                # print(_type,len(inverted_indices[_type]))
+                all_lenght+=len(inverted_indices[_type])
+        # print(f"all_lenght:{all_lenght}")
         return inverted_indices
 
     def get_types_metadata(self):
@@ -304,6 +307,7 @@ class MustashhedApp:
             # Load the list from the file
             with open(f"static/resources/{_type}/Processed_sentences.pkl", 'rb') as file:
                 sentences[_type] = pickle.load(file)
+                # print(_type,len(sentences[_type]))
 
         return sentences
 
@@ -466,7 +470,7 @@ class MustashhedApp:
                 orignal_sentences = []
                 for faiss_index ,faiss_distance in zip(faiss_indices,faiss_distances):
                     sentence_index = faiss_index_to_sentence_index_dict[faiss_index]
-                    words_form_examples.append(self.generate_html_sentence(sentence=self.sentences[_type][sentence_index], word_to_highlight=word_form,example_type=_type,sentence_index=sentence_index))
+                    words_form_examples.append(self.generate_html_sentence(sentence=self.sentences[_type][sentence_index], word_to_highlight=word_form,example_type=_type,sentence_index=sentence_index,distance=faiss_distance))
                     orignal_sentences.append(self.sentences[_type][sentence_index])
                     self.write_to_logs(f"word:{word_form}, example:{self.sentences[_type][sentence_index]}")
                 current_resource_type_all_words_forms_examples.append((word_form, words_form_examples, faiss_distances,orignal_sentences))
@@ -480,19 +484,30 @@ class MustashhedApp:
         for examples_type in examples_dict.keys():
             for word_examples_distances_orignal_sentences_tuple in examples_dict[examples_type]:
                 word, examples, distances,orignal_sentences = word_examples_distances_orignal_sentences_tuple
-                for example,distance,orignal_sentence in zip(examples, distances, orignal_sentences):
+                for example,distance,orignal_sentence in zip(examples[:MAX_NUM_OF_EXAMPLES_PER_WORD], distances[:MAX_NUM_OF_EXAMPLES_PER_WORD], orignal_sentences[:MAX_NUM_OF_EXAMPLES_PER_WORD]):
                     words_examples[word].append({"example":example,"distance":distance,"type":examples_type,'orignal_sentence':orignal_sentence})
 
-        # Sorting the examples based on the distance from the query (not by the type)
+        # Sorting the examples based on the distance from the query (not by the type) in descending order
         for word in words_examples.keys():
             words_examples[word] = sorted(words_examples[word], key=lambda x: x['distance'], reverse=True)
+        # Sorting the examples based on the distance from the query (not by the type)
+
+        # Sort python_dict based on the average of "distance" values for each key
+        sorted_dict = {}
+        for word, values in words_examples.items():
+            avg_distance = sum(d['distance'] for d in values) / len(values)
+            sorted_dict[word] = avg_distance
+        # Sort the dictionary based on average distance in descending order
+        sorted_dict = dict(sorted(sorted_dict.items(), key=lambda item: item[1], reverse=True))
+        words_examples = {key: words_examples[key] for key in sorted_dict}
+        # Sort python_dict based on the average of "distance" values for each key
 
         examples_list = []
         for word in words_examples.keys():
             examples = []
             print(f"Word:{word}")
             self.write_to_logs(f"Word:{word}")
-            for dic in words_examples[word][:MAX_NUM_OF_EXAMPLES_PER_WORD]:
+            for dic in words_examples[word]:
                 examples.append(dic['example'])
                 print(f"\t-sentence:{dic['orignal_sentence']}\n\t- distance:{dic['distance']}\n\n")
                 self.write_to_logs(f"\t-sentence:{dic['orignal_sentence']}\n\t- distance:{dic['distance']}\n\n")
@@ -548,7 +563,7 @@ class MustashhedApp:
         #     all_forms_of_word.insert(0, word)
         return all_forms_of_word
 
-    def generate_html_sentence(self, sentence, word_to_highlight,example_type,sentence_index):
+    def generate_html_sentence(self, sentence, word_to_highlight,example_type,sentence_index,distance):
         orignal_sentence = sentence
         sentence = self.extract_window_around_word(sentence,word_to_highlight)
         if example_type == "quraan":
@@ -576,7 +591,8 @@ class MustashhedApp:
 
         red_words = words_positions_in_sentences[word_to_highlight]
 
-        html_output = f'<span title="{orignal_sentence}">'
+        html_output = f'<span title="درجة التشابه: {str(distance * 100)}%\n{orignal_sentence}">'
+        # html_output = f'<span title="{orignal_sentence}">'
 
 
         current_pos = 0
