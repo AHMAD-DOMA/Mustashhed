@@ -1,4 +1,16 @@
-# Version 1.3
+MAX_NUM_OF_EXAMPLES_PER_WORD = 1000
+EXAMPLE_THRESHOLD = 0.0
+REMOVE_SIMILAR_EXAMPLES_THRESHOLD = 0.000005
+TEXT_WINDOW_SIZE = 9
+# DISPLAY_WAY = 1 # DISPLAY_EXAMPLES_GROUPED_BY_WORDS_AND_SORT_WORDS_BASED_ON_AVERAGE_AND_SORT_EXAMPLES_WHIN_GROUPES_BASED_ON_SCORE
+DISPLAY_WAY = 2 # DISPLAY_EXAMPLES_SORTED_BY_SCORE_AND_GROUP_CONSECUTIVE_PART_BY_WORD
+
+API_KEY = ""
+
+SUPPORTED_EXAMPLES_TYPES = ["news","quraan","poetry","hadith"]
+# SUPPORTED_EXAMPLES_TYPES = ["poetry","hadith","quraan"]
+
+
 import os
 import time
 from collections import defaultdict
@@ -24,16 +36,10 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(device)
 
 arabic_stop_words = ['اللاتي', 'كلا', 'ولكن', 'عسى', 'بهما', 'فيما', 'لكي', 'لدى', 'لستما', 'كلما', 'نحن', 'سوى', 'الذي', 'كيتما', 'هم', 'هؤلاء', 'وهو', 'بين', 'ليس', 'هيت', 'أنتن', 'اللواتي', 'أيك', 'إذ', 'غير', 'كل', 'هذي', 'أولئك', 'هيا', 'بماذا', 'أولالك', 'فإذا', 'إليكما', 'ذان', 'هذا', 'ذينك', 'حاشا', 'ثمة', 'متى', 'بلى', 'ولا', 'أينما', 'على', 'كي', 'ليسوا', 'ذلكن', 'وما', 'أما', 'هناك', 'كأي', 'لها', 'ألا', 'لكم', 'اللذين', 'أولائك', 'ليستا', 'لو', 'أولئكم', 'عليه', 'فمن', 'إذن', 'فيه', 'ذانك', 'أقل', 'لهن', 'لستن', 'بهن', 'لاسيما', 'هنا', 'وإذ', 'هذين', 'بمن', 'بعد', 'ذي', 'أنتم', 'أيكما', 'لي', 'حيث', 'نحو', 'أنت', 'ماذا', 'إذما', 'إنها', 'إنه', 'أيكم', 'تي', 'تلكما', 'إلا', 'بس', 'حين', 'عندما', 'عن', 'كليهما', 'يا', 'كيفما', 'أولاء', 'أيها', 'ذو', 'أيا', 'به', 'كما', 'لهم', 'عند', 'إلينا', 'لسنا', 'ذلكما', 'أيهما', 'اللائي', 'بخ', 'كيت', 'بكم', 'هاك', 'بعض', 'الذين', 'كم', 'هيهات', 'أيهم', 'هاهنا', 'ولو', 'أنى', 'لكما', 'لكنما', 'وإذا', 'بكما', 'هو', 'إنما', 'سوف', 'لولا', 'كلاهما', 'لنا', 'أ', 'ما', 'لا', 'هل', 'ليسا', 'ته', 'تلك', 'اللتيا', 'فيها', 'هلا', 'ذا', 'أوه', 'ذه', 'اللتان', 'أي', 'عدا', 'فيم', 'هكذا', 'فلا', 'ذين', 'ها', 'أيه', 'إذا', 'دون', 'إن', 'لم', 'حبذا', 'أكثر', 'إليكم', 'ذوا', 'أف', 'إلى', 'كذا', 'بل', 'إلا أن', 'في', 'كأين', 'ومن', 'ذواتا', 'بنا', 'أيهن', 'عل', 'كليكما', 'أو', 'اللتين', 'ذاك', 'إليك', 'نعم', 'هنالك', 'خلا', 'أولائكم', 'كأن', 'كلتا', 'ذلك', 'هاته', 'هن', 'مع', 'منذ', 'كذلك', 'بما', 'لسن', 'أم', 'تلكم', 'أيكن', 'قد', 'هما', 'لستم', 'منها', 'بها', 'ذلكم', 'أن', 'بكن', 'مهما', 'كأنما', 'بك', 'اللذان', 'لوما', 'كيف', 'حتى', 'أين', 'بهم', 'تينك', 'ثم', 'له', 'من', 'ليست', 'شتان', 'أنا', 'ذواتي', 'لك', 'أنتما', 'مذ', 'لكن', 'مما', 'ريث', 'وإن', 'هذان', 'مه', 'بيد', 'فإن', 'حيثما', 'إما', 'لهما', 'إليكن', 'تين', 'بي', 'لكيلا', 'لن', 'عليك', 'لئن', 'ليت', 'لست', 'لما', 'منه', 'هي', 'ممن', 'هذه', 'لعل']
-MAX_NUM_OF_EXAMPLES_PER_WORD = 1000
-EXAMPLE_THRESHOLD = 0.0
-REMOVE_SIMILAR_EXAMPLES_THRESHOLD = 0.000005
-TEXT_WINDOW_SIZE = 9
-SUPPORTED_EXAMPLES_TYPES = ["news","quraan","poetry","hadith"]
-# SUPPORTED_EXAMPLES_TYPES = ["poetry","hadith","quraan"]
+
 
 EXAMPLES_TYPES_REQUIRE_METADATA = ["quraan","hadith"]
 
-API_KEY = ""
 
 class MustashhedApp:
     def __init__(self, name):
@@ -133,7 +139,15 @@ class MustashhedApp:
                             else:
                                 self.word_type = "Noun"
                             break
-                    self.meaning = word_with_diacr +": "+ self.meaning
+                    # meaning = word_with_diacr +": "+ self.meaning
+                    # self.meaning = meaning
+
+                    meaning_sections =  self.meaning.split(":")
+                    if len(meaning_sections) > 1:
+                        self.meaning = meaning_sections[1]
+                    else:
+                        self.meaning = meaning_sections[0]
+
                     self.examples = self.get_examples_with_faiss(self.word, self.meaning, self.word_type, self.resource_type)
                 except:
                     self.write_to_logs("Exception in get_examples_setup_2()")
@@ -479,41 +493,81 @@ class MustashhedApp:
             examples_dict[_type] = current_resource_type_all_words_forms_examples
 
         # Create a defaultdict with default values as empty lists
-        words_examples = defaultdict(list)
-
+        words_examples = defaultdict(list) # for DISPLAY_WAY == 1
+        flattend_list_of_examples_dicts = [] # for DISPLAY_WAY == 2
         for examples_type in examples_dict.keys():
             for word_examples_distances_orignal_sentences_tuple in examples_dict[examples_type]:
                 word, examples, distances,orignal_sentences = word_examples_distances_orignal_sentences_tuple
                 for example,distance,orignal_sentence in zip(examples[:MAX_NUM_OF_EXAMPLES_PER_WORD], distances[:MAX_NUM_OF_EXAMPLES_PER_WORD], orignal_sentences[:MAX_NUM_OF_EXAMPLES_PER_WORD]):
                     words_examples[word].append({"example":example,"distance":distance,"type":examples_type,'orignal_sentence':orignal_sentence})
-
-        # Sorting the examples based on the distance from the query (not by the type) in descending order
-        for word in words_examples.keys():
-            words_examples[word] = sorted(words_examples[word], key=lambda x: x['distance'], reverse=True)
-        # Sorting the examples based on the distance from the query (not by the type)
-
-        # Sort python_dict based on the average of "distance" values for each key
-        sorted_dict = {}
-        for word, values in words_examples.items():
-            avg_distance = sum(d['distance'] for d in values) / len(values)
-            sorted_dict[word] = avg_distance
-        # Sort the dictionary based on average distance in descending order
-        sorted_dict = dict(sorted(sorted_dict.items(), key=lambda item: item[1], reverse=True))
-        words_examples = {key: words_examples[key] for key in sorted_dict}
-        # Sort python_dict based on the average of "distance" values for each key
+                    flattend_list_of_examples_dicts.append({"word": word,"example":[example],"distance":distance,"type":examples_type,'orignal_sentence':orignal_sentence})
 
         examples_list = []
-        for word in words_examples.keys():
-            examples = []
-            print(f"Word:{word}")
-            self.write_to_logs(f"Word:{word}")
-            for dic in words_examples[word]:
-                examples.append(dic['example'])
-                print(f"\t-sentence:{dic['orignal_sentence']}\n\t- distance:{dic['distance']}\n\n")
-                self.write_to_logs(f"\t-sentence:{dic['orignal_sentence']}\n\t- distance:{dic['distance']}\n\n")
-            print(f"-------------------")
-            self.write_to_logs(f"-------------------")
-            examples_list.append((word,examples))
+
+        if DISPLAY_WAY == 1:
+            # Sorting the examples based on the distance from the query (not by the type) in descending order
+            for word in words_examples.keys():
+                words_examples[word] = sorted(words_examples[word], key=lambda x: x['distance'], reverse=True)
+            # Sorting the examples based on the distance from the query (not by the type)
+
+            # Sort python_dict based on the average of "distance" values for each key
+            sorted_dict = {}
+            for word, values in words_examples.items():
+                avg_distance = sum(d['distance'] for d in values) / len(values)
+                sorted_dict[word] = avg_distance
+            # Sort the dictionary based on average distance in descending order
+            sorted_dict = dict(sorted(sorted_dict.items(), key=lambda item: item[1], reverse=True))
+            words_examples = {key: words_examples[key] for key in sorted_dict}
+            # Sort python_dict based on the average of "distance" values for each key
+
+            # Form the html needed output list of (word,examples),(word,examples),(word,examples),...
+
+            for word in words_examples.keys():
+                examples = []
+                print(f"Word:{word}")
+                self.write_to_logs(f"Word:{word}")
+                for dic in words_examples[word]:
+                    examples.append(dic['example'])
+                    print(f"\t-sentence:{dic['orignal_sentence']}\n\t- distance:{dic['distance']}\n\n")
+                    self.write_to_logs(f"\t-sentence:{dic['orignal_sentence']}\n\t- distance:{dic['distance']}\n\n")
+                print(f"-------------------")
+                self.write_to_logs(f"-------------------")
+                examples_list.append((word,examples))
+            # Form the html needed output list of (word,examples),(word,examples),(word,examples),...
+
+        elif DISPLAY_WAY == 2:
+            # Sort by score absolutely
+            flattend_list_of_examples_dicts = sorted(flattend_list_of_examples_dicts, key=lambda x: x["distance"],reverse=True)
+
+            # Form the html needed output list of (word,examples),(word,examples),(word,examples),...
+
+
+            # Initialize variables to store the current word and examples
+            current_word = None
+            current_examples = []
+
+            for item in flattend_list_of_examples_dicts:
+                word = item["word"]
+                examples = item["example"]
+
+                if current_word is None:
+                    # For the first item, simply set the current_word and current_examples
+                    current_word = word
+                    current_examples = examples
+                elif current_word == word:
+                    # If the current word is the same as the previous one, add their example lists
+                    current_examples.extend(examples)
+                else:
+                    # If the current word is different, add the tuple (current_word, current_examples) to the result list
+                    examples_list.append((current_word, current_examples))
+                    # Reset current_word and current_examples for the new word
+                    current_word = word
+                    current_examples = examples
+
+            # Add the last tuple to the result list
+            examples_list.append((current_word, current_examples))
+
+            # Form the html needed output list of (word,examples),(word,examples),(word,examples),...
 
         return examples_list
 
