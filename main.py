@@ -1,6 +1,10 @@
 # MODEL_NAME = "arabert_base"
 # MODEL_NAME = "arabert_large"
-MODEL_NAME = "Arabic_KW_Mdel"
+# MODEL_NAME = "Arabic_KW_Mdel"
+MODEL_NAME = "KW_Model_without_SW"
+
+
+Arabic_KW_Mdel_with_remove_stopwords = True
 
 MAX_NUM_OF_EXAMPLES_PER_WORD = 1000
 EXAMPLE_THRESHOLD = 0.0
@@ -39,8 +43,6 @@ from tqdm import tqdm
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(device)
 
-arabic_stop_words = ['اللاتي', 'كلا', 'ولكن', 'عسى', 'بهما', 'فيما', 'لكي', 'لدى', 'لستما', 'كلما', 'نحن', 'سوى', 'الذي', 'كيتما', 'هم', 'هؤلاء', 'وهو', 'بين', 'ليس', 'هيت', 'أنتن', 'اللواتي', 'أيك', 'إذ', 'غير', 'كل', 'هذي', 'أولئك', 'هيا', 'بماذا', 'أولالك', 'فإذا', 'إليكما', 'ذان', 'هذا', 'ذينك', 'حاشا', 'ثمة', 'متى', 'بلى', 'ولا', 'أينما', 'على', 'كي', 'ليسوا', 'ذلكن', 'وما', 'أما', 'هناك', 'كأي', 'لها', 'ألا', 'لكم', 'اللذين', 'أولائك', 'ليستا', 'لو', 'أولئكم', 'عليه', 'فمن', 'إذن', 'فيه', 'ذانك', 'أقل', 'لهن', 'لستن', 'بهن', 'لاسيما', 'هنا', 'وإذ', 'هذين', 'بمن', 'بعد', 'ذي', 'أنتم', 'أيكما', 'لي', 'حيث', 'نحو', 'أنت', 'ماذا', 'إذما', 'إنها', 'إنه', 'أيكم', 'تي', 'تلكما', 'إلا', 'بس', 'حين', 'عندما', 'عن', 'كليهما', 'يا', 'كيفما', 'أولاء', 'أيها', 'ذو', 'أيا', 'به', 'كما', 'لهم', 'عند', 'إلينا', 'لسنا', 'ذلكما', 'أيهما', 'اللائي', 'بخ', 'كيت', 'بكم', 'هاك', 'بعض', 'الذين', 'كم', 'هيهات', 'أيهم', 'هاهنا', 'ولو', 'أنى', 'لكما', 'لكنما', 'وإذا', 'بكما', 'هو', 'إنما', 'سوف', 'لولا', 'كلاهما', 'لنا', 'أ', 'ما', 'لا', 'هل', 'ليسا', 'ته', 'تلك', 'اللتيا', 'فيها', 'هلا', 'ذا', 'أوه', 'ذه', 'اللتان', 'أي', 'عدا', 'فيم', 'هكذا', 'فلا', 'ذين', 'ها', 'أيه', 'إذا', 'دون', 'إن', 'لم', 'حبذا', 'أكثر', 'إليكم', 'ذوا', 'أف', 'إلى', 'كذا', 'بل', 'إلا أن', 'في', 'كأين', 'ومن', 'ذواتا', 'بنا', 'أيهن', 'عل', 'كليكما', 'أو', 'اللتين', 'ذاك', 'إليك', 'نعم', 'هنالك', 'خلا', 'أولائكم', 'كأن', 'كلتا', 'ذلك', 'هاته', 'هن', 'مع', 'منذ', 'كذلك', 'بما', 'لسن', 'أم', 'تلكم', 'أيكن', 'قد', 'هما', 'لستم', 'منها', 'بها', 'ذلكم', 'أن', 'بكن', 'مهما', 'كأنما', 'بك', 'اللذان', 'لوما', 'كيف', 'حتى', 'أين', 'بهم', 'تينك', 'ثم', 'له', 'من', 'ليست', 'شتان', 'أنا', 'ذواتي', 'لك', 'أنتما', 'مذ', 'لكن', 'مما', 'ريث', 'وإن', 'هذان', 'مه', 'بيد', 'فإن', 'حيثما', 'إما', 'لهما', 'إليكن', 'تين', 'بي', 'لكيلا', 'لن', 'عليك', 'لئن', 'ليت', 'لست', 'لما', 'منه', 'هي', 'ممن', 'هذه', 'لعل']
-
 
 EXAMPLES_TYPES_REQUIRE_METADATA = ["quraan","hadith"]
 
@@ -64,6 +66,8 @@ class MustashhedApp:
         self.embeddings = self.get_all_embeddings()
         self.types_metadata = self.get_types_metadata()
         self.model, self.tokenizer = self.get_model_and_tokenizer()
+        self.arabic_stop_words = self.load_nltk_arabic_stopwords()
+        print(self.arabic_stop_words)
         self.reinflector = Reinflector(MorphologyDB.builtin_db(flags='r'))
         print("CAMLTool's setup Completed")
 
@@ -287,10 +291,12 @@ class MustashhedApp:
         if MODEL_NAME == "arabert_base":
             saved_model_path = "static/resources/arabert_base/bert-base-arabertv02"
             huggingface_hub_model_name = "aubmindlab/bert-base-arabertv02"
+
         if MODEL_NAME == "arabert_large":
             saved_model_path = "static/resources/arabert_large/bert-large-arabertv02"
             huggingface_hub_model_name = "aubmindlab/bert-large-arabertv02"
-        if MODEL_NAME == "Arabic_KW_Mdel":
+
+        if MODEL_NAME == "Arabic_KW_Mdel" or MODEL_NAME == "KW_Model_without_SW":
             saved_model_path = "static/resources/Arabic_KW_Mdel/Arabic-KW-Mdel"
             huggingface_hub_model_name = "medmediani/Arabic-KW-Mdel"
 
@@ -310,15 +316,16 @@ class MustashhedApp:
 
 
     def get_all_inverted_indices(self):
+        unique = set()
         inverted_indices = {}
-        all_lenght = 0
         for _type in tqdm(SUPPORTED_EXAMPLES_TYPES,desc="get_all_inverted_indices()"):
             # Load the list from the file
             with open(f"static/resources/{MODEL_NAME}/{_type}/inverted_index.pkl", 'rb') as file:
                 inverted_indices[_type] = pickle.load(file)
                 print(_type,len(inverted_indices[_type]))
-                all_lenght+=len(inverted_indices[_type])
-        print(f"all_lenght:{all_lenght}")
+                for key in inverted_indices[_type]:
+                    unique.add(key)
+        print(f"unique:{len(unique)}")
         return inverted_indices
 
     def get_types_metadata(self):
@@ -330,13 +337,17 @@ class MustashhedApp:
         return types_metadata
 
     def get_all_sentences(self):
+        unique = set()
+
         sentences = {}
         for _type in tqdm(SUPPORTED_EXAMPLES_TYPES,desc="get_all_sentences()"):
             # Load the list from the file
             with open(f"static/resources/{MODEL_NAME}/{_type}/Processed_sentences.pkl", 'rb') as file:
                 sentences[_type] = pickle.load(file)
                 print(_type,len(sentences[_type]))
-
+                for sent in sentences[_type]:
+                    unique.add(sent)
+        print(f"unique:{len(unique)}")
         return sentences
 
     def get_all_embeddings(self):
@@ -407,7 +418,7 @@ class MustashhedApp:
 
     def get_examples_with_faiss(self,word ,meaning, word_type, resource_type):
 
-        meaning_filtered_words = [word for word in meaning.split() if word not in arabic_stop_words]
+        meaning_filtered_words = [word for word in meaning.split() if word not in self.arabic_stop_words]
         # Join the filtered words back into a sentence
         meaning = ' '.join(meaning_filtered_words)
 
@@ -750,6 +761,10 @@ class MustashhedApp:
             # Write the input data to the file with a newline character
             file.write(str(data) + '\n')
 
+    def load_nltk_arabic_stopwords(self):
+        with open("static/resources/nltk_arabic_stopwords.pkl", 'rb') as file:
+            arabic_stopwords = pickle.load(file)
+        return arabic_stopwords
 
 if __name__ == '__main__':
     my_app = MustashhedApp(__name__)
