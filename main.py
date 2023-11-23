@@ -4,14 +4,15 @@
 MODEL_NAME = "KW_Model_without_SW"
 
 
-Arabic_KW_Mdel_with_remove_stopwords = True
-
+REMOVE_SENTENCE_IF_BECOME_SHORT_AFTER_REMOVING_STOPWORDS = True
+REMOVE_SENTENCE_IF_BECOME_SHORT_AFTER_REMOVING_STOPWORDS_N = 3
 MAX_NUM_OF_EXAMPLES_PER_WORD = 1000
-EXAMPLE_THRESHOLD = 0.0
+EXAMPLE_THRESHOLD = 0.5
 REMOVE_SIMILAR_EXAMPLES_THRESHOLD = 0.000005
 TEXT_WINDOW_SIZE = 9
 # DISPLAY_WAY = 1 # DISPLAY_EXAMPLES_GROUPED_BY_WORDS_AND_SORT_WORDS_BASED_ON_AVERAGE_AND_SORT_EXAMPLES_WHIN_GROUPES_BASED_ON_SCORE
 DISPLAY_WAY = 2 # DISPLAY_EXAMPLES_SORTED_BY_SCORE_AND_GROUP_CONSECUTIVE_PART_BY_WORD
+GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2 = False
 
 API_KEY = ""
 
@@ -46,6 +47,7 @@ print(device)
 
 EXAMPLES_TYPES_REQUIRE_METADATA = ["quraan","hadith"]
 
+Excluded_Words_From_Meanings = ["فلان", "فلانا", "لفلان", "بفلان", "شيء", "الشيء", "أمر", "الأمر", "كذا", "بكذا", "فعل", "الفعل", "ونحوه", "ونحوها", "غيره", "وغيره", "وغيرها"]
 
 class MustashhedApp:
     def __init__(self, name):
@@ -66,8 +68,7 @@ class MustashhedApp:
         self.embeddings = self.get_all_embeddings()
         self.types_metadata = self.get_types_metadata()
         self.model, self.tokenizer = self.get_model_and_tokenizer()
-        self.arabic_stop_words = self.load_nltk_arabic_stopwords()
-        print(self.arabic_stop_words)
+        self.arabic_stopwords = self.load_arabic_stopwords()
         self.reinflector = Reinflector(MorphologyDB.builtin_db(flags='r'))
         print("CAMLTool's setup Completed")
 
@@ -84,9 +85,9 @@ class MustashhedApp:
     def change_the_setup(self):
         try:
             self.setup = request.form.get('destination')
-            return render_template(f'setup_{self.setup}.html',examples=[], word="", meaning="", mode=self.mode, word_type="Noun", resource_type = self.resource_type)
+            return render_template(f'setup_{self.setup}.html',examples=[], word="", meaning="", mode=self.mode, word_type="Noun", resource_type = self.resource_type,GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2=GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2)
         except:
-            return render_template(f'setup_1.html',examples=[], word="", meaning="", mode="light", word_type="Noun", resource_type = "all")
+            return render_template(f'setup_1.html',examples=[], word="", meaning="", mode="light", word_type="Noun", resource_type = "all",GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2=GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2)
 
     def index(self):
         mode = request.form.get('mode')
@@ -112,10 +113,13 @@ class MustashhedApp:
             except:
                 print("Exception in get_examples_setup_1()")
                 self.write_to_logs("Exception in get_examples_setup_1()")
-
-            return render_template(f'setup_{self.setup}.html', examples=self.examples, word=self.word,meaning=self.meaning, word_type= self.word_type,resource_type = self.resource_type , mode=self.mode)
+            print(self.examples)
+            if len(self.examples) == 0 :
+                print("HHHHH")
+                self.examples = [("",["لم نجد أمثلة!"])]
+            return render_template(f'setup_{self.setup}.html', examples=self.examples, word=self.word,meaning=self.meaning, word_type= self.word_type,resource_type = self.resource_type , mode=self.mode,GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2=GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2)
         except:
-            return render_template(f'setup_1.html',examples=[], word="", meaning="", mode="light", word_type="Noun", resource_type = "all")
+            return render_template(f'setup_1.html',examples=[], word="", meaning="", mode="light", word_type="Noun", resource_type = "all",GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2=GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2)
 
     def get_examples_setup_2(self):
         try:
@@ -128,7 +132,7 @@ class MustashhedApp:
 
             if self.meaning == 'لعرض المعاني: قم بكتابة الكلمة ثم اضغط على "استرجاع المعاني"' or self.meaning == None:
                 self.list_of_meanings_dicts = self.get_list_of_meanings_dicts_for_word(self.word)
-                return render_template(f'setup_{self.setup}.html',list_of_meanings_dicts=self.list_of_meanings_dicts, examples=None, word=self.word,meaning=self.meaning, word_type= self.word_type,resource_type = self.resource_type , mode=self.mode)
+                return render_template(f'setup_{self.setup}.html',list_of_meanings_dicts=self.list_of_meanings_dicts, examples=None, word=self.word,meaning=self.meaning, word_type= self.word_type,resource_type = self.resource_type , mode=self.mode,GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2=GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2)
 
             else:
                 try:
@@ -147,22 +151,14 @@ class MustashhedApp:
                             else:
                                 self.word_type = "Noun"
                             break
-                    # meaning = word_with_diacr +": "+ self.meaning
-                    # self.meaning = meaning
-
-                    meaning_sections =  self.meaning.split(":")
-                    if len(meaning_sections) > 1:
-                        self.meaning = meaning_sections[1]
-                    else:
-                        self.meaning = meaning_sections[0]
 
                     self.examples = self.get_examples_with_faiss(self.word, self.meaning, self.word_type, self.resource_type)
                 except:
                     self.write_to_logs("Exception in get_examples_setup_2()")
 
-            return render_template(f'setup_{self.setup}.html',list_of_meanings_dicts=[meaning_dict], examples=self.examples, word=self.word,meaning="",resource_type = self.resource_type , mode=self.mode)
+            return render_template(f'setup_{self.setup}.html',list_of_meanings_dicts=[meaning_dict], examples=self.examples, word=self.word,meaning="",resource_type = self.resource_type , mode=self.mode,GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2=GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2)
         except:
-            return render_template(f'setup_1.html',examples=[], word="", meaning="", mode="light", word_type="Noun", resource_type = "all")
+            return render_template(f'setup_1.html',examples=[], word="", meaning="", mode="light", word_type="Noun", resource_type = "all",GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2=GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2)
 
     def contribute_in_alriyadh_dictionary_add(self):
         try:
@@ -173,9 +169,9 @@ class MustashhedApp:
             example = request.form.get('example')
 
             self.add_data_to_csv("static/users_contributions.csv", word, example, meaning, resource_type, word_type, report=False, add=True)
-            return render_template(f'setup_{self.setup}.html', word="",meaning="",resource_type = "",mode=self.mode)
+            return render_template(f'setup_{self.setup}.html', word="",meaning="",resource_type = "",mode=self.mode,GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2=GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2)
         except:
-            return render_template(f'setup_1.html',examples=[], word="", meaning="", mode="light", word_type="Noun", resource_type = "all")
+            return render_template(f'setup_1.html',examples=[], word="", meaning="", mode="light", word_type="Noun", resource_type = "all",GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2=GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2)
 
     def contribute_in_alriyadh_dictionary_report(self):
         try:
@@ -186,9 +182,9 @@ class MustashhedApp:
             example = request.form.get('example')
 
             self.add_data_to_csv("static/users_contributions.csv", word, example, meaning, resource_type, word_type, report=True, add=False)
-            return render_template(f'setup_{self.setup}.html', word="",meaning="",resource_type = "",mode=self.mode)
+            return render_template(f'setup_{self.setup}.html', word="",meaning="",resource_type = "",mode=self.mode,GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2=GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2)
         except:
-            return render_template(f'setup_1.html',examples=[], word="", meaning="", mode="light", word_type="Noun", resource_type = "all")
+            return render_template(f'setup_1.html',examples=[], word="", meaning="", mode="light", word_type="Noun", resource_type = "all",GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2=GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2)
 
 
     def add_data_to_csv(self,file_path, word, example, meaning,resource_type, word_type, report=False, add=False):
@@ -276,9 +272,9 @@ class MustashhedApp:
         try:
             mode = request.form.get('mode')
             self.mode = mode
-            return render_template(f'setup_{self.setup}.html', examples=[], word="",meaning="", word_type= "Noun", mode=self.mode,resource_type = "all")
+            return render_template(f'setup_{self.setup}.html', examples=[], word="",meaning="", word_type= "Noun", mode=self.mode,resource_type = "all",GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2=GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2)
         except:
-            return render_template(f'setup_1.html',examples=[], word="", meaning="", mode="light", word_type="Noun", resource_type = "all")
+            return render_template(f'setup_1.html',examples=[], word="", meaning="", mode="light", word_type="Noun", resource_type = "all",GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2=GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2)
 
     def move_tuple_to_beginning(self,lst, target_value):
         for i, item in enumerate(lst):
@@ -322,10 +318,10 @@ class MustashhedApp:
             # Load the list from the file
             with open(f"static/resources/{MODEL_NAME}/{_type}/inverted_index.pkl", 'rb') as file:
                 inverted_indices[_type] = pickle.load(file)
-                print(_type,len(inverted_indices[_type]))
+                # print(_type,len(inverted_indices[_type]))
                 for key in inverted_indices[_type]:
                     unique.add(key)
-        print(f"unique:{len(unique)}")
+        # print(f"unique:{len(unique)}")
         return inverted_indices
 
     def get_types_metadata(self):
@@ -344,10 +340,10 @@ class MustashhedApp:
             # Load the list from the file
             with open(f"static/resources/{MODEL_NAME}/{_type}/Processed_sentences.pkl", 'rb') as file:
                 sentences[_type] = pickle.load(file)
-                print(_type,len(sentences[_type]))
+                # print(_type,len(sentences[_type]))
                 for sent in sentences[_type]:
                     unique.add(sent)
-        print(f"unique:{len(unique)}")
+        # print(f"unique:{len(unique)}")
         return sentences
 
     def get_all_embeddings(self):
@@ -362,20 +358,6 @@ class MustashhedApp:
             embeddings[_type] = embeddings_list
 
         return embeddings
-
-    # def make_queries_embeddings(self, words, meaning, word_type):
-    #     query = f"{words[0]}:{meaning}" # Make only one query for the first word form .. as we don't need to make query for each word form
-    #     input_ids = self.tokenizer(query, return_tensors="pt", padding=True).to(device)
-    #     # Get the model's output
-    #     with torch.no_grad():
-    #         output = self.model(**input_ids)
-    #
-    #     # Get the embeddings from the output
-    #     queries_embeddings = output.last_hidden_state
-    #     # Get the Average over the 1st dim
-    #     queries_embeddings = torch.mean(queries_embeddings, dim=1)
-    #
-    #     return [queries_embeddings for word in words]
 
     def make_queries_embeddings(self, words, meaning, word_type):
         queries = [f"{word}:{meaning}" for word in words]
@@ -418,7 +400,7 @@ class MustashhedApp:
 
     def get_examples_with_faiss(self,word ,meaning, word_type, resource_type):
 
-        meaning_filtered_words = [word for word in meaning.split() if word not in self.arabic_stop_words]
+        meaning_filtered_words = [word for word in meaning.split() if word not in self.arabic_stopwords + Excluded_Words_From_Meanings]
         # Join the filtered words back into a sentence
         meaning = ' '.join(meaning_filtered_words)
 
@@ -507,12 +489,21 @@ class MustashhedApp:
                 faiss_indices = indices
                 faiss_distances = distances
                 orignal_sentences = []
+                distances = []
                 for faiss_index ,faiss_distance in zip(faiss_indices,faiss_distances):
                     sentence_index = faiss_index_to_sentence_index_dict[faiss_index]
+                    if REMOVE_SENTENCE_IF_BECOME_SHORT_AFTER_REMOVING_STOPWORDS:
+                        list_of_sentence_words = self.sentences[_type][sentence_index].split()
+                        intial_lenght = len(list_of_sentence_words)
+                        list_of_sentence_words = [sentence_word for sentence_word in list_of_sentence_words if sentence_word not in self.arabic_stopwords]
+                        if len(list_of_sentence_words) != intial_lenght and len(list_of_sentence_words) < REMOVE_SENTENCE_IF_BECOME_SHORT_AFTER_REMOVING_STOPWORDS_N:
+                            print(f"RRRRR-{self.sentences[_type][sentence_index]}")
+                            continue
                     words_form_examples.append(self.generate_html_sentence(sentence=self.sentences[_type][sentence_index], word_to_highlight=word_form,example_type=_type,sentence_index=sentence_index,distance=faiss_distance))
                     orignal_sentences.append(self.sentences[_type][sentence_index])
+                    distances.append(faiss_distance)
                     self.write_to_logs(f"word:{word_form}, example:{self.sentences[_type][sentence_index]}")
-                current_resource_type_all_words_forms_examples.append((word_form, words_form_examples, faiss_distances,orignal_sentences))
+                current_resource_type_all_words_forms_examples.append((word_form, words_form_examples, distances,orignal_sentences))
             print("--- %s seconds ---" % (time.time() - start_time))
 
             examples_dict[_type] = current_resource_type_all_words_forms_examples
@@ -571,26 +562,27 @@ class MustashhedApp:
             current_word = None
             current_examples = []
 
-            for item in flattend_list_of_examples_dicts:
-                word = item["word"]
-                examples = item["example"]
+            if len(flattend_list_of_examples_dicts) > 0:
+                for item in flattend_list_of_examples_dicts:
+                    word = item["word"]
+                    examples = item["example"]
 
-                if current_word is None:
-                    # For the first item, simply set the current_word and current_examples
-                    current_word = word
-                    current_examples = examples
-                elif current_word == word:
-                    # If the current word is the same as the previous one, add their example lists
-                    current_examples.extend(examples)
-                else:
-                    # If the current word is different, add the tuple (current_word, current_examples) to the result list
-                    examples_list.append((current_word, current_examples))
-                    # Reset current_word and current_examples for the new word
-                    current_word = word
-                    current_examples = examples
+                    if current_word is None:
+                        # For the first item, simply set the current_word and current_examples
+                        current_word = word
+                        current_examples = examples
+                    elif current_word == word:
+                        # If the current word is the same as the previous one, add their example lists
+                        current_examples.extend(examples)
+                    else:
+                        # If the current word is different, add the tuple (current_word, current_examples) to the result list
+                        examples_list.append((current_word, current_examples))
+                        # Reset current_word and current_examples for the new word
+                        current_word = word
+                        current_examples = examples
 
-            # Add the last tuple to the result list
-            examples_list.append((current_word, current_examples))
+                # Add the last tuple to the result list
+                examples_list.append((current_word, current_examples))
 
             # Form the html needed output list of (word,examples),(word,examples),(word,examples),...
 
@@ -673,7 +665,7 @@ class MustashhedApp:
 
         red_words = words_positions_in_sentences[word_to_highlight]
 
-        html_output = f'<span title="درجة التشابه: {str(distance * 100)}%\n{orignal_sentence}">'
+        html_output = f'<span title="نسبة التشابه: %{str(distance * 100)[:5]}\n{orignal_sentence}">'
         # html_output = f'<span title="{orignal_sentence}">'
 
 
@@ -761,9 +753,10 @@ class MustashhedApp:
             # Write the input data to the file with a newline character
             file.write(str(data) + '\n')
 
-    def load_nltk_arabic_stopwords(self):
-        with open("static/resources/nltk_arabic_stopwords.pkl", 'rb') as file:
-            arabic_stopwords = pickle.load(file)
+    def load_arabic_stopwords(self):
+        with open("static/resources/arabic_stopwords.txt", 'r',encoding="UTF-8") as file:
+            arabic_stopwords = [line.strip() for line in file]
+
         return arabic_stopwords
 
 if __name__ == '__main__':
