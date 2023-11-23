@@ -106,8 +106,9 @@
         <ul>
 
             {% for highlighted_word_with_examples in examples%}
+            {% if GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2 %}
             <span class="examples_word">{{highlighted_word_with_examples[0]}}</span>
-
+            {% endif %}
                 {% for example in highlighted_word_with_examples[1] %}
                 <li>
                     {{example|safe}}

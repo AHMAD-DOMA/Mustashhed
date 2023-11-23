@@ -73,8 +73,11 @@
         <img src="static/images/drop_down.png" style="width: 21px;position: absolute;margin: 22px  0 0 34px;">
         <label title="اختر معنى الكلمة" for="type-select" class="meaning_label">المعنى</label>
         <select title="اختر معنى الكلمة" class="dropdown-select" name="meaning" id="type-select" {% if not list_of_meanings_dicts or list_of_meanings_dicts and word and examples %} style="color: gray; cursor: not-allowed" readonly {% endif %}>
-            {% if not list_of_meanings_dicts %}
+            {% if not list_of_meanings_dicts and not word %}
             <option>لعرض المعاني: قم بكتابة الكلمة ثم اضغط على "استرجاع المعاني"</option>
+            {% endif %}
+            {% if not list_of_meanings_dicts and  word%}
+            <option>لم نجد معاني!</option>
             {% endif %}
             {% if list_of_meanings_dicts %}
             {% for item in list_of_meanings_dicts %}
@@ -106,14 +109,14 @@
     <ul id="examples_ul">
         {% if examples %}
             {% for highlighted_word_with_examples in examples%}
-            <span class="examples_word">{{highlighted_word_with_examples[0]}}</span>
-
-            {% for example in highlighted_word_with_examples[1] %}
-            <li>
-                {{example|safe}}
-            </li>
-            {% endfor %}
-
+                {% if GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2 %}
+                <span class="examples_word">{{highlighted_word_with_examples[0]}}</span>
+                {% endif %}
+                {% for example in highlighted_word_with_examples[1] %}
+                <li>
+                    {{example|safe}}
+                </li>
+                {% endfor %}
 
             {% endfor %}
         {% endif %}
@@ -130,6 +133,14 @@
 
 
 <script>
+
+    if (document.getElementById("type-select").value === "لم نجد معاني!") {
+        var button = document.getElementById("search_submit");
+        button.disabled = true;
+        button.style.color = "gray"
+    }
+
+
     // Get references to the button and your Flask variables
     var button = document.getElementById('new_search_button');
     var list_of_meanings_dicts = {{ list_of_meanings_dicts|default('undefined')|tojson|safe }};
