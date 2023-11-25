@@ -1,13 +1,18 @@
 # MODEL_NAME = "arabert_base"
 # MODEL_NAME = "arabert_large"
-# MODEL_NAME = "Arabic_KW_Mdel"
-MODEL_NAME = "KW_Model_without_SW"
+MODEL_NAME = "Arabic_KW_Mdel"
+# MODEL_NAME = "KW_Model_without_SW"
 
 
-REMOVE_SENTENCE_IF_BECOME_SHORT_AFTER_REMOVING_STOPWORDS = True
+REMOVE_SENTENCE_IF_BECOME_SHORT_AFTER_REMOVING_STOPWORDS = False
 REMOVE_SENTENCE_IF_BECOME_SHORT_AFTER_REMOVING_STOPWORDS_N = 3
 MAX_NUM_OF_EXAMPLES_PER_WORD = 1000
-EXAMPLE_THRESHOLD = 0.5
+
+EXAMPLE_THRESHOLD = 0.35
+REMOVE_STOPWORDS_FROM_MEANING = True
+REMOVE_WORD_FROM_MEANING = True
+REMOVE_EXCLUDED_WORDS_FROM_MEANING = True
+
 REMOVE_SIMILAR_EXAMPLES_THRESHOLD = 0.000005
 TEXT_WINDOW_SIZE = 9
 # DISPLAY_WAY = 1 # DISPLAY_EXAMPLES_GROUPED_BY_WORDS_AND_SORT_WORDS_BASED_ON_AVERAGE_AND_SORT_EXAMPLES_WHIN_GROUPES_BASED_ON_SCORE
@@ -113,16 +118,15 @@ class MustashhedApp:
             except:
                 print("Exception in get_examples_setup_1()")
                 self.write_to_logs("Exception in get_examples_setup_1()")
-            print(self.examples)
+
             if len(self.examples) == 0 :
-                print("HHHHH")
                 self.examples = [("",["لم نجد أمثلة!"])]
             return render_template(f'setup_{self.setup}.html', examples=self.examples, word=self.word,meaning=self.meaning, word_type= self.word_type,resource_type = self.resource_type , mode=self.mode,GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2=GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2)
         except:
             return render_template(f'setup_1.html',examples=[], word="", meaning="", mode="light", word_type="Noun", resource_type = "all",GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2=GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2)
 
     def get_examples_setup_2(self):
-        try:
+        # try:
             self.word = request.form.get('word')
             self.meaning = request.form.get('meaning')
             self.resource_type = request.form.get('resource_type')
@@ -135,7 +139,7 @@ class MustashhedApp:
                 return render_template(f'setup_{self.setup}.html',list_of_meanings_dicts=self.list_of_meanings_dicts, examples=None, word=self.word,meaning=self.meaning, word_type= self.word_type,resource_type = self.resource_type , mode=self.mode,GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2=GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2)
 
             else:
-                try:
+                # try:
                     self.meaning = request.form.get('meaning')
                     for item in self.list_of_meanings_dicts:
                         if self.meaning == item['meaning']: # becuase the meaning in the UI is consists from word_with_diacr+ space+meaning
@@ -153,12 +157,14 @@ class MustashhedApp:
                             break
 
                     self.examples = self.get_examples_with_faiss(self.word, self.meaning, self.word_type, self.resource_type)
-                except:
-                    self.write_to_logs("Exception in get_examples_setup_2()")
+                    if len(self.examples) == 0 :
+                        self.examples = [("",["لم نجد أمثلة!"])]
+                # except:
+                #     self.write_to_logs("Exception in get_examples_setup_2()")
 
-            return render_template(f'setup_{self.setup}.html',list_of_meanings_dicts=[meaning_dict], examples=self.examples, word=self.word,meaning="",resource_type = self.resource_type , mode=self.mode,GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2=GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2)
-        except:
-            return render_template(f'setup_1.html',examples=[], word="", meaning="", mode="light", word_type="Noun", resource_type = "all",GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2=GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2)
+            return render_template(f'setup_{self.setup}.html',selected_meaning=meaning_dict,list_of_meanings_dicts=self.list_of_meanings_dicts, examples=self.examples, word=self.word,meaning="",resource_type = self.resource_type , mode=self.mode,GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2=GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2)
+        # except:
+        #     return render_template(f'setup_1.html',examples=[], word="", meaning="", mode="light", word_type="Noun", resource_type = "all",GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2=GROUP_EXAMPLES_BY_WORD_IN_DISPLAY_WAY_2)
 
     def contribute_in_alriyadh_dictionary_add(self):
         try:
@@ -400,9 +406,23 @@ class MustashhedApp:
 
     def get_examples_with_faiss(self,word ,meaning, word_type, resource_type):
 
-        meaning_filtered_words = [word for word in meaning.split() if word not in self.arabic_stopwords + Excluded_Words_From_Meanings]
-        # Join the filtered words back into a sentence
-        meaning = ' '.join(meaning_filtered_words)
+        if REMOVE_STOPWORDS_FROM_MEANING:
+            meaning_filtered_words = [word for word in meaning.split() if dediac_ar(word) not in self.arabic_stopwords]
+            # Join the filtered words back into a sentence
+            meaning = ' '.join(meaning_filtered_words)
+
+        if REMOVE_EXCLUDED_WORDS_FROM_MEANING:
+            meaning_filtered_words = [word for word in meaning.split() if dediac_ar(word) not in Excluded_Words_From_Meanings]
+            # Join the filtered words back into a sentence
+            meaning = ' '.join(meaning_filtered_words)
+
+        if REMOVE_WORD_FROM_MEANING:
+            for word_in_meaning in meaning.split():
+                if dediac_ar(word_in_meaning) == word:
+                    meaning = meaning.replace(word_in_meaning+" ","")
+                    meaning = meaning.replace(" "+word_in_meaning,"")
+
+
 
         print(f"Query: word:{word} ,meaning:{meaning}, word_type:{word_type}, resource_type:{resource_type}")
         self.write_to_logs(f"Query: word:{word} ,meaning:{meaning}, word_type:{word_type}, resource_type:{resource_type}")
@@ -490,6 +510,7 @@ class MustashhedApp:
                 faiss_distances = distances
                 orignal_sentences = []
                 distances = []
+
                 for faiss_index ,faiss_distance in zip(faiss_indices,faiss_distances):
                     sentence_index = faiss_index_to_sentence_index_dict[faiss_index]
                     if REMOVE_SENTENCE_IF_BECOME_SHORT_AFTER_REMOVING_STOPWORDS:
@@ -497,7 +518,6 @@ class MustashhedApp:
                         intial_lenght = len(list_of_sentence_words)
                         list_of_sentence_words = [sentence_word for sentence_word in list_of_sentence_words if sentence_word not in self.arabic_stopwords]
                         if len(list_of_sentence_words) != intial_lenght and len(list_of_sentence_words) < REMOVE_SENTENCE_IF_BECOME_SHORT_AFTER_REMOVING_STOPWORDS_N:
-                            print(f"RRRRR-{self.sentences[_type][sentence_index]}")
                             continue
                     words_form_examples.append(self.generate_html_sentence(sentence=self.sentences[_type][sentence_index], word_to_highlight=word_form,example_type=_type,sentence_index=sentence_index,distance=faiss_distance))
                     orignal_sentences.append(self.sentences[_type][sentence_index])
@@ -540,13 +560,13 @@ class MustashhedApp:
 
             for word in words_examples.keys():
                 examples = []
-                print(f"Word:{word}")
+                # print(f"Word:{word}")
                 self.write_to_logs(f"Word:{word}")
                 for dic in words_examples[word]:
                     examples.append(dic['example'])
-                    print(f"\t-sentence:{dic['orignal_sentence']}\n\t- distance:{dic['distance']}\n\n")
+                    # print(f"\t-sentence:{dic['orignal_sentence']}\n\t- distance:{dic['distance']}\n\n")
                     self.write_to_logs(f"\t-sentence:{dic['orignal_sentence']}\n\t- distance:{dic['distance']}\n\n")
-                print(f"-------------------")
+                # print(f"-------------------")
                 self.write_to_logs(f"-------------------")
                 examples_list.append((word,examples))
             # Form the html needed output list of (word,examples),(word,examples),(word,examples),...

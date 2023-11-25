@@ -72,7 +72,7 @@
 
         <img src="static/images/drop_down.png" style="width: 21px;position: absolute;margin: 22px  0 0 34px;">
         <label title="اختر معنى الكلمة" for="type-select" class="meaning_label">المعنى</label>
-        <select title="اختر معنى الكلمة" class="dropdown-select" name="meaning" id="type-select" {% if not list_of_meanings_dicts or list_of_meanings_dicts and word and examples %} style="color: gray; cursor: not-allowed" readonly {% endif %}>
+        <select title="اختر معنى الكلمة" class="dropdown-select" name="meaning" id="type-select" {% if not list_of_meanings_dicts %} style="color: gray; cursor: not-allowed" readonly {% endif %}>
             {% if not list_of_meanings_dicts and not word %}
             <option>لعرض المعاني: قم بكتابة الكلمة ثم اضغط على "استرجاع المعاني"</option>
             {% endif %}
@@ -81,7 +81,8 @@
             {% endif %}
             {% if list_of_meanings_dicts %}
             {% for item in list_of_meanings_dicts %}
-            <option value="{{ item['meaning'] }}" title="{{ item['word_with_diacr'] + ': ' + item['meaning'] }}">
+            <option value="{{ item['meaning'] }}" title="{{ item['word_with_diacr'] + ': ' + item['meaning'] }}"
+                    {% if selected_meaning and selected_meaning['meaning'] == item['meaning'] %} selected {% endif %}>
                 {{ item['html'] }}
             </option>
             {% endfor %}
@@ -100,7 +101,9 @@
             <input type="hidden" id="type_hiddenInput" name="resource_type" value="{{resource_type}}">
         </div>
 
-        <input title="اضغط لإدخال كلمة جديدة" value="إفراغ" class="search-button" id="new_search_button" onclick="new_search()" style="margin: -45px 273px 0px 0px;color: rgb(228, 0, 0);background: gold;display: none;width: 63px;font-family: 'NotoKufiArabic-Regular';font-size: 18px;height: 27px;">        <input type="submit" id="search_submit" class="search-button" {% if list_of_meanings_dicts and word and examples %} style="cursor: not-allowed" disabled {% endif %}   {% if not word and not list_of_meanings_dicts %} value="استرجاع المعاني" title="استرجاع المعاني" {% else %} value="البحث عن الأمثلة" {% if list_of_meanings_dicts and word and examples %} title="اضغط على إفراغ لإدخال كلمة جديدة" {% else %} title="البحث عن الأمثلة" {% endif %} {% endif %}>
+        <input title="اضغط لإدخال كلمة جديدة" value="إفراغ" class="search-button" id="new_search_button" onclick="new_search()" style="margin: -45px 273px 0px 0px;color: rgb(228, 0, 0);background: gold;display: none;width: 63px;font-family: 'NotoKufiArabic-Regular';font-size: 18px;height: 27px;">
+
+        <input type="submit" id="search_submit" class="search-button" {% if not word and not list_of_meanings_dicts %} value="استرجاع المعاني" title="استرجاع المعاني" {% else %} value="البحث عن الأمثلة" title="البحث عن الأمثلة"  {% endif %}>
         <div id="overlay">
             <div id="loader"></div>
             <span style="direction: rtl">جارٍ البحث...</span>
